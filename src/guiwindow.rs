@@ -23,15 +23,18 @@ pub struct GUIWindow {
     title: String,
 }
 
-impl GUIWindow {
-    pub fn default() -> GUIWindow {
+impl Default for GUIWindow {
+    // Returns a windows with all of the default values.
+    fn default() -> GUIWindow {
         GUIWindow {
             width: 500,
             height: 500,
             title: String::from("Form1"),
         }
     }
+}
 
+impl GUIWindow {
     /// Sets the width of the window in units of logical pixels.
     pub fn set_width(&mut self, width: impl GetLength) -> &mut Self {
         self.width = width.get_length();
@@ -63,6 +66,7 @@ impl GUIWindow {
 }
 
 async fn run(event_loop: EventLoop<()>, window: Window, processing: GUIProcessing) {
+    // https://sotrh.github.io/learn-wgpu/beginner/tutorial2-surface/#instance-and-adapter
     let size = window.inner_size();
     let instance = wgpu::Instance::new(processing.backend());
     let surface = unsafe { instance.create_surface(&window) };
