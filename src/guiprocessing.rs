@@ -20,18 +20,18 @@ struct State {
 }
 
 impl State {
-    async fn new(window: &Window, guiwindow: GUIWindow) -> Self {
+    async fn new(window: &Window, guiwindow: GUIWindow, guiresources: GUIResources) -> Self {
         let size = window.inner_size();
 
         // The instance is a handle to our GPU
         // BackendBit::PRIMARY => Vulkan + Metal + DX12 + Browser WebGPU
-        let instance = wgpu::Instance::new(wgpu::Backends::all());
+        let instance = wgpu::Instance::new(guiresources.backend());
         // The surface is part of the window that's drawn to.
         let surface = unsafe { instance.create_surface(window) };
         // The adapter is the handle to the actual graphics card.
         let adapter = instance
             .request_adapter(&wgpu::RequestAdapterOptions {
-                power_preference: wgpu::PowerPreference::default(),
+                power_preference: guiresources.power_preference(),
                 compatible_surface: Some(&surface),
                 force_fallback_adapter: false,
             })
@@ -130,7 +130,7 @@ impl State {
     }
 }
 
-pub fn GUIProcessing(guiwindow: GUIWindow) {
+pub fn gui_processing(guiwindow: GUIWindow, guiresources: GUIResources) {
     env_logger::init();
     let event_loop = EventLoop::new();
     let window = WindowBuilder::new().build(&event_loop).unwrap();
@@ -138,7 +138,7 @@ pub fn GUIProcessing(guiwindow: GUIWindow) {
     window.set_inner_size(PhysicalSize::new(guiwindow.size.width, guiwindow.size.height));
 
     // State::new uses async code, so we're going to wait for it to finish
-    let mut state: State = pollster::block_on(State::new(&window, guiwindow));
+    let mut state: State = pollster::block_on(State::new(&window, guiwindow, guiresources));
 
     event_loop.run(move |event, _, control_flow| {
         match event {
