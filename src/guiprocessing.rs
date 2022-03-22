@@ -20,12 +20,14 @@ pub enum GUIBackend {
 }
 
 impl Default for GUIBackend {
+    /// Returns an array of Backends in the order in which they
+    /// should be tested for compatability with the Adapter.
     fn default() -> Self {
         //https://doc.rust-lang.org/std/env/consts/constant.OS.html
         match env::consts::OS {
             "linux" | "android" => Self::Vulkan,
             "macos" | "ios" => Self::Metal,
-            "windows" => Self::Dx11,
+            "windows" => Self::Dx12,
             _ => Self::Vulkan,
         }
     }
@@ -47,7 +49,7 @@ impl Default for GUIPowerPreference {
 
 /// Represents the the resourcess that are to be used while processing the gui.
 pub struct GUIProcessing {
-    /// Power Preference when choosing a physical adapter. 
+    /// Power Preference when choosing a physical adapter.
     power_preference: GUIPowerPreference,
     /// Represents the backends that gui-rs will use.
     backend: GUIBackend,

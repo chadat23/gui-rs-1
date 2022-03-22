@@ -9,7 +9,7 @@ use crate::guiposition::guilengths::GetLength;
 use crate::guiprocessing::GUIProcessing;
 
 /// Represents a gui window.
-/// Given the number of properties that a window has, 
+/// Given the number of properties that a window has,
 /// rather than accounting for all of them in the creation
 /// of the window, a mutable window struct is created with
 /// default values, and then setters are used to set
