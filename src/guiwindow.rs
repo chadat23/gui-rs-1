@@ -5,7 +5,8 @@ use winit::event::{Event, WindowEvent};
 use winit::event_loop::{ControlFlow, EventLoop};
 use winit::window::Window;
 
-use crate::guiposition::guisizes::{SetSize, GetSize};
+use crate::guiposition::guisizes::GetSize;
+use crate::guiprocessing::GUIProcessing;
 
 pub struct GUIWindow {
     width: u16,
@@ -18,7 +19,7 @@ impl GUIWindow {
         GUIWindow {
             width: 500,
             height: 500,
-            title: "Title".to_string(),
+            title: String::from("Form1"),
         }
     }
 
@@ -37,23 +38,23 @@ impl GUIWindow {
         self
     }
 
-    pub fn start(&self) {
+    pub fn start(&self, processing: GUIProcessing) {
         let event_loop = EventLoop::new();
         let window = winit::window::Window::new(&event_loop).unwrap();
         window.set_title(self.title.as_str());
         window.set_inner_size(LogicalSize::new(self.width, self.height));
         env_logger::init();
-        pollster::block_on(run(event_loop, window));
+        pollster::block_on(run(event_loop, window, processing));
     }
 }
 
-pub async fn run(event_loop: EventLoop<()>, window: Window) {
+pub async fn run(event_loop: EventLoop<()>, window: Window, processing: GUIProcessing) {
     let size = window.inner_size();
-    let instance = wgpu::Instance::new(wgpu::Backends::VULKAN);
+    let instance = wgpu::Instance::new(processing.backend());
     let surface = unsafe { instance.create_surface(&window) };
     let adapter = instance
         .request_adapter(&wgpu::RequestAdapterOptions {
-            power_preference: wgpu::PowerPreference::default(),
+            power_preference: processing.power_preference(),
             compatible_surface: Some(&surface),
             force_fallback_adapter: false,
         })
