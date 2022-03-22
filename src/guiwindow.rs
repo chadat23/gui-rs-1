@@ -1,12 +1,6 @@
-use std::iter;
-
-use winit::dpi::{LogicalSize, PhysicalSize};
-use winit::event::{ElementState, Event, KeyboardInput, VirtualKeyCode, WindowEvent};
-use winit::event_loop::{ControlFlow, EventLoop};
-use winit::window::Window;
+use winit::dpi::PhysicalSize;
 
 use crate::guiposition::guilengths::GetLength;
-use crate::guiresources::GUIResources;
 
 /// Represents a gui window.
 /// Given the number of properties that a window has,
