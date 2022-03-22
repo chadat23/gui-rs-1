@@ -1,45 +1,55 @@
-pub mod guisizes {
+/// A module of structs and tools for representing linear lengths.
+pub mod guilengths {
+    /// Represents heights.
     pub struct GUIHeight {
-        size: f64,
+        length: f64,
     }
 
-    impl GetSize for GUIHeight {
-        fn get_size(&self) -> u16 {
-            self.size.round() as u16
+    impl GetLength for GUIHeight {
+        /// Returns the stored height.
+        fn get_length(&self) -> u16 {
+            self.length.round() as u16
         }
     }
 
+    /// Represents widths.
     pub struct GUIWidth {
-        size: f64,
+        length: f64,
     }
 
-    impl GetSize for GUIWidth {
-        fn get_size(&self) -> u16 {
-            self.size.round() as u16
+    impl GetLength for GUIWidth {
+        /// Returns the stored width
+        fn get_length(&self) -> u16 {
+            self.length.round() as u16
         }
     }
 
-    pub struct GUISize {
-        size: f64,
+    /// Represents a linear dimension (height or width).
+    pub struct GUILength {
+        length: f64,
     }
 
-    impl GetSize for GUISize {
-        fn get_size(&self) -> u16 {
-            self.size.round() as u16
+    impl GetLength for GUILength {
+        /// Returns the stored length
+        fn get_length(&self) -> u16 {
+            self.length.round() as u16
         }
     }
 
-    impl SetSize for GUISize {
-        fn from_pixels(pixels: f64) -> GUISize {
-            GUISize { size: pixels }
+    impl SetLength for GUILength {
+        /// Sets the length of the GUILength in logical pixels.
+        fn from_pixels(pixels: f64) -> GUILength {
+            GUILength { length: pixels }
         }
     }
 
-    pub trait GetSize {
-        fn get_size(&self) -> u16;
+    pub trait GetLength {
+        /// Returns the length of the property
+        fn get_length(&self) -> u16;
     }
 
-    pub trait SetSize {
+    pub trait SetLength {
+        /// Sets the length of the property in logical pixels.
         fn from_pixels(pixels: f64) -> Self;
     }
 }

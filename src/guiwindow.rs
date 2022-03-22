@@ -5,12 +5,21 @@ use winit::event::{Event, WindowEvent};
 use winit::event_loop::{ControlFlow, EventLoop};
 use winit::window::Window;
 
-use crate::guiposition::guisizes::GetSize;
+use crate::guiposition::guilengths::GetLength;
 use crate::guiprocessing::GUIProcessing;
 
+/// Represents a gui window.
+/// Given the number of properties that a window has, 
+/// rather than accounting for all of them in the creation
+/// of the window, a mutable window struct is created with
+/// default values, and then setters are used to set
+/// individual properties that need to be customized.
 pub struct GUIWindow {
+    /// The width of the window.
     width: u16,
+    /// The height of the window.
     height: u16,
+    /// The tile of the window.
     title: String,
 }
 
@@ -23,21 +32,26 @@ impl GUIWindow {
         }
     }
 
-    pub fn set_width(&mut self, width: impl GetSize) -> &mut Self {
-        self.width = width.get_size();
+    /// Sets the width of the window in units of logical pixels.
+    pub fn set_width(&mut self, width: impl GetLength) -> &mut Self {
+        self.width = width.get_length();
         self
     }
 
-    pub fn set_height(&mut self, height: impl GetSize) -> &mut Self {
-        self.height = height.get_size();
+    /// Sets the height of the window in units of logical pixels.
+    pub fn set_height(&mut self, height: impl GetLength) -> &mut Self {
+        self.height = height.get_length();
         self
     }
 
+    /// Sets the title of the window.
     pub fn set_title(&mut self, title: String) -> &mut Self {
         self.title = title;
         self
     }
 
+    /// Starts the processes that create and render the window as well as
+    /// initiate the event loop.
     pub fn start(&self, processing: GUIProcessing) {
         let event_loop = EventLoop::new();
         let window = winit::window::Window::new(&event_loop).unwrap();
@@ -48,7 +62,7 @@ impl GUIWindow {
     }
 }
 
-pub async fn run(event_loop: EventLoop<()>, window: Window, processing: GUIProcessing) {
+async fn run(event_loop: EventLoop<()>, window: Window, processing: GUIProcessing) {
     let size = window.inner_size();
     let instance = wgpu::Instance::new(processing.backend());
     let surface = unsafe { instance.create_surface(&window) };
