@@ -1,12 +1,12 @@
-use std::borrow::Cow;
+use std::iter;
 
-use winit::dpi::LogicalSize;
-use winit::event::{Event, WindowEvent};
+use winit::dpi::{LogicalSize, PhysicalSize};
+use winit::event::{ElementState, Event, KeyboardInput, VirtualKeyCode, WindowEvent};
 use winit::event_loop::{ControlFlow, EventLoop};
 use winit::window::Window;
 
 use crate::guiposition::guilengths::GetLength;
-use crate::guiprocessing::GUIProcessing;
+use crate::guiresources::GUIResources;
 
 /// Represents a gui window.
 /// Given the number of properties that a window has,
@@ -15,21 +15,21 @@ use crate::guiprocessing::GUIProcessing;
 /// default values, and then setters are used to set
 /// individual properties that need to be customized.
 pub struct GUIWindow {
-    /// The width of the window.
-    width: u16,
-    /// The height of the window.
-    height: u16,
     /// The tile of the window.
-    title: String,
+    pub title: String,
+    /// The size of the window.
+    pub size: winit::dpi::PhysicalSize<u32>,
+    /// The minimum size of the window.
+    pub min_size: winit::dpi::PhysicalSize<u32>,
 }
 
 impl Default for GUIWindow {
     // Returns a windows with all of the default values.
     fn default() -> GUIWindow {
         GUIWindow {
-            width: 500,
-            height: 500,
             title: String::from("Form1"),
+            size: PhysicalSize { width: 500, height: 500 },
+            min_size: PhysicalSize { width: 100, height: 100 },
         }
     }
 }
@@ -37,13 +37,27 @@ impl Default for GUIWindow {
 impl GUIWindow {
     /// Sets the width of the window in units of logical pixels.
     pub fn set_width(&mut self, width: impl GetLength) -> &mut Self {
-        self.width = width.get_length();
+        self.size.width = width.get_length();
         self
     }
 
     /// Sets the height of the window in units of logical pixels.
     pub fn set_height(&mut self, height: impl GetLength) -> &mut Self {
-        self.height = height.get_length();
+        self.size.height = height.get_length();
+        self
+    }
+
+    /// Sets the minimum width of the window in units of logical pixels.
+    pub fn set_min_width(&mut self, width: impl GetLength) -> &mut Self {
+        let width = width.get_length();
+        self.min_size.width = if width > 0 {width} else {1};
+        self
+    }
+
+    /// Sets the minimum height of the window in units of logical pixels.
+    pub fn set_min_height(&mut self, height: impl GetLength) -> &mut Self {
+        let height = height.get_length();
+        self.min_size.height = if height > 0 {height} else {1};
         self
     }
 
@@ -52,135 +66,4 @@ impl GUIWindow {
         self.title = title;
         self
     }
-
-    /// Starts the processes that create and render the window as well as
-    /// initiate the event loop.
-    pub fn start(&self, processing: GUIProcessing) {
-        let event_loop = EventLoop::new();
-        let window = winit::window::Window::new(&event_loop).unwrap();
-        window.set_title(self.title.as_str());
-        window.set_inner_size(LogicalSize::new(self.width, self.height));
-        env_logger::init();
-        pollster::block_on(run(event_loop, window, processing));
-    }
-}
-
-async fn run(event_loop: EventLoop<()>, window: Window, processing: GUIProcessing) {
-    // https://sotrh.github.io/learn-wgpu/beginner/tutorial2-surface/#instance-and-adapter
-    let size = window.inner_size();
-    let instance = wgpu::Instance::new(processing.backend());
-    let surface = unsafe { instance.create_surface(&window) };
-    let adapter = instance
-        .request_adapter(&wgpu::RequestAdapterOptions {
-            power_preference: processing.power_preference(),
-            compatible_surface: Some(&surface),
-            force_fallback_adapter: false,
-        })
-        .await
-        .expect("Failed to find an appropriate adapter");
-
-    let (device, queue) = adapter
-        .request_device(
-            &wgpu::DeviceDescriptor {
-                label: None,
-                features: wgpu::Features::empty(),
-                limits: wgpu::Limits::default(),
-            },
-            None,
-        )
-        .await
-        .expect("Failed to create device");
-
-    let format = surface.get_preferred_format(&adapter).unwrap();
-    let mut config = wgpu::SurfaceConfiguration {
-        usage: wgpu::TextureUsages::RENDER_ATTACHMENT,
-        format,
-        width: size.width,
-        height: size.height,
-        present_mode: wgpu::PresentMode::Mailbox,
-    };
-
-    // load the shaders from disk
-    let shader = device.create_shader_module(&wgpu::ShaderModuleDescriptor {
-        label: None,
-        source: wgpu::ShaderSource::Wgsl(Cow::Borrowed(include_str!("shader.wgsl"))),
-    });
-
-    let pipeline_layout = device.create_pipeline_layout(&wgpu::PipelineLayoutDescriptor {
-        label: None,
-        bind_group_layouts: &[],
-        push_constant_ranges: &[],
-    });
-
-    let render_pipeline = device.create_render_pipeline(&wgpu::RenderPipelineDescriptor {
-        label: None,
-        layout: Some(&pipeline_layout),
-        vertex: wgpu::VertexState {
-            module: &shader,
-            entry_point: "vs_main",
-            buffers: &[],
-        },
-        fragment: Some(wgpu::FragmentState {
-            module: &shader,
-            entry_point: "fs_main",
-            targets: &[format.into()],
-        }),
-        primitive: wgpu::PrimitiveState::default(),
-        depth_stencil: None,
-        multisample: wgpu::MultisampleState::default(),
-        multiview: None,
-    });
-
-    event_loop.run(move |event, _, control_flow| {
-        let _ = (&instance, &adapter, &shader, &pipeline_layout);
-        *control_flow = ControlFlow::Wait;
-
-        match event {
-            Event::WindowEvent {
-                event: WindowEvent::Resized(size),
-                ..
-            } => {
-                // Recreate the surface with the new size
-                config.width = size.width;
-                config.height = size.height;
-                surface.configure(&device, &config);
-            }
-            Event::RedrawRequested(_) => {
-                let frame = surface.get_current_texture().unwrap();
-                let view = frame
-                    .texture
-                    .create_view(&wgpu::TextureViewDescriptor::default());
-                let mut encoder =
-                    device.create_command_encoder(&wgpu::CommandEncoderDescriptor { label: None });
-                {
-                    let mut rpass = encoder.begin_render_pass(&wgpu::RenderPassDescriptor {
-                        label: None,
-                        color_attachments: &[wgpu::RenderPassColorAttachment {
-                            view: &view,
-                            resolve_target: None,
-                            ops: wgpu::Operations {
-                                load: wgpu::LoadOp::Clear(wgpu::Color {
-                                    r: 0.05,
-                                    g: 0.062,
-                                    b: 0.08,
-                                    a: 1.0,
-                                }),
-                                store: true,
-                            },
-                        }],
-                        depth_stencil_attachment: None,
-                    });
-                    rpass.set_pipeline(&render_pipeline);
-                    rpass.draw(0..3, 0..1);
-                }
-                queue.submit(Some(encoder.finish()));
-                frame.present();
-            }
-            Event::WindowEvent {
-                event: WindowEvent::CloseRequested,
-                ..
-            } => *control_flow = ControlFlow::Exit,
-            _ => {}
-        }
-    })
 }

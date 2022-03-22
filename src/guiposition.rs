@@ -7,8 +7,8 @@ pub mod guilengths {
 
     impl GetLength for GUIHeight {
         /// Returns the stored height.
-        fn get_length(&self) -> u16 {
-            self.length.round() as u16
+        fn get_length(&self) -> u32 {
+            self.length.round() as u32
         }
     }
 
@@ -19,8 +19,8 @@ pub mod guilengths {
 
     impl GetLength for GUIWidth {
         /// Returns the stored width
-        fn get_length(&self) -> u16 {
-            self.length.round() as u16
+        fn get_length(&self) -> u32 {
+            self.length.round() as u32
         }
     }
 
@@ -31,8 +31,8 @@ pub mod guilengths {
 
     impl GetLength for GUILength {
         /// Returns the stored length
-        fn get_length(&self) -> u16 {
-            self.length.round() as u16
+        fn get_length(&self) -> u32 {
+            self.length.round() as u32
         }
     }
 
@@ -45,7 +45,7 @@ pub mod guilengths {
 
     pub trait GetLength {
         /// Returns the length of the property
-        fn get_length(&self) -> u16;
+        fn get_length(&self) -> u32;
     }
 
     pub trait SetLength {

@@ -2,5 +2,6 @@
 // https://docs.rs/wgpu/0.12.0/wgpu/
 
 pub mod guiposition;
-pub mod guiprocessing;
+pub mod guiresources;
 pub mod guiwindow;
+pub mod guiprocessing;
