@@ -1,7 +1,5 @@
 use std::iter;
 
-use std::cmp::max;
-
 use winit::dpi::PhysicalSize;
 use winit::event::{Event, ElementState, KeyboardInput, VirtualKeyCode, WindowEvent};
 use winit::event_loop::{ControlFlow, EventLoop};
@@ -70,17 +68,9 @@ impl State {
         }
     }
     fn resize(&mut self, new_size: winit::dpi::PhysicalSize<u32>) {
-        let width = max(new_size.width, self.guiwindow.min_size.width);
-        let height = max(new_size.height, self.guiwindow.min_size.height);
-
-        println!("{width} {height}");
-
-        self.guiwindow.size = PhysicalSize {
-            width,
-            height
-        };
-        self.config.width = width;
-        self.config.height = height;
+        self.guiwindow.size = PhysicalSize { width: new_size.width, height: new_size.height };
+        self.config.width = new_size.width;
+        self.config.height = new_size.height;
         self.surface.configure(&self.device, &self.config);
     }
 
@@ -136,6 +126,7 @@ pub fn gui_processing(guiwindow: GUIWindow, guiresources: GUIResources) {
     let window = WindowBuilder::new().build(&event_loop).unwrap();
     window.set_title(guiwindow.title.as_str());
     window.set_inner_size(PhysicalSize::new(guiwindow.size.width, guiwindow.size.height));
+    window.set_min_inner_size(Some(PhysicalSize::new(guiwindow.min_size.width, guiwindow.min_size.height)));
 
     // State::new uses async code, so we're going to wait for it to finish
     let mut state: State = pollster::block_on(State::new(&window, guiwindow, guiresources));
@@ -161,11 +152,11 @@ pub fn gui_processing(guiwindow: GUIWindow, guiresources: GUIResources) {
                         } => *control_flow = ControlFlow::Exit,
                         WindowEvent::Resized(physical_size) => {
                             state.resize(*physical_size);
-                        }
+                        },
                         WindowEvent::ScaleFactorChanged { new_inner_size, .. } => {
                             // new_inner_size is &&mut so w have to dereference it twice
                             state.resize(**new_inner_size);
-                        }
+                        },
                         _ => {}
                     }
                 }
