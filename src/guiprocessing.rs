@@ -13,7 +13,6 @@ struct State {
     device: wgpu::Device,
     queue: wgpu::Queue,
     config: wgpu::SurfaceConfiguration,
-    size: winit::dpi::PhysicalSize<u32>,
     guiwindow: GUIWindow
 }
 
@@ -63,7 +62,6 @@ impl State {
             device,
             queue,
             config,
-            size,
             guiwindow,
         }
     }
@@ -124,7 +122,7 @@ pub fn gui_processing(guiwindow: GUIWindow, guiresources: GUIResources) {
     env_logger::init();
     let event_loop = EventLoop::new();
     let window = WindowBuilder::new().build(&event_loop).unwrap();
-    window.set_title(guiwindow.title.as_str());
+    window.set_title(guiwindow.title);
     window.set_inner_size(PhysicalSize::new(guiwindow.size.width, guiwindow.size.height));
     window.set_min_inner_size(Some(PhysicalSize::new(guiwindow.min_size.width, guiwindow.min_size.height)));
 
@@ -162,11 +160,11 @@ pub fn gui_processing(guiwindow: GUIWindow, guiresources: GUIResources) {
                 }
             }
             Event::RedrawRequested(window_id) if window_id == window.id() => {
-                state.update();
+                // state.update();
                 match state.render() {
                     Ok(_) => {}
                     // Reconfigure the surface if lost
-                    Err(wgpu::SurfaceError::Lost) => state.resize(state.size),
+                    Err(wgpu::SurfaceError::Lost) => state.resize(state.guiwindow.size),
                     // The system is out of memory, we should probably quit
                     Err(wgpu::SurfaceError::OutOfMemory) => *control_flow = ControlFlow::Exit,
                     // All other errors (Outdated, Timeout) should be resolved by the next frame

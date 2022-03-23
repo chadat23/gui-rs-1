@@ -9,8 +9,8 @@ use crate::guiposition::guilengths::GetLength;
 /// default values, and then setters are used to set
 /// individual properties that need to be customized.
 pub struct GUIWindow {
-    /// The tile of the window.
-    pub title: String,
+    // /// The tile of the window.
+    pub title: &'static str,
     /// The size of the window.
     pub size: winit::dpi::PhysicalSize<u32>,
     /// The minimum size of the window.
@@ -21,7 +21,7 @@ impl Default for GUIWindow {
     // Returns a windows with all of the default values.
     fn default() -> GUIWindow {
         GUIWindow {
-            title: String::from("Form1"),
+            title: "Form1",
             size: PhysicalSize { width: 500, height: 500 },
             min_size: PhysicalSize { width: 100, height: 100 },
         }
@@ -56,7 +56,7 @@ impl GUIWindow {
     }
 
     /// Sets the title of the window.
-    pub fn set_title(&mut self, title: String) -> &mut Self {
+    pub fn set_title(&mut self, title: &'static str) -> &mut Self {
         self.title = title;
         self
     }
