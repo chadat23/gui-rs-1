@@ -3,5 +3,5 @@
 
 pub mod guiposition;
 pub mod guiresources;
-pub mod guiwindow;
+pub mod guiwidgets;
 pub mod guiprocessing;

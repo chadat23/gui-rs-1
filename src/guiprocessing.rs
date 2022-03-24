@@ -5,7 +5,7 @@ use winit::event::{Event, ElementState, KeyboardInput, VirtualKeyCode, WindowEve
 use winit::event_loop::{ControlFlow, EventLoop};
 use winit::window::{Window, WindowBuilder};
 
-use crate::guiwindow::GUIWindow;
+use crate::guiwidgets::GUIWindow;
 use crate::guiresources::GUIResources;
 
 struct State {
@@ -18,8 +18,6 @@ struct State {
 
 impl State {
     async fn new(window: &Window, guiwindow: GUIWindow, guiresources: GUIResources) -> Self {
-        let size = window.inner_size();
-
         // The instance is a handle to our GPU
         // BackendBit::PRIMARY => Vulkan + Metal + DX12 + Browser WebGPU
         let instance = wgpu::Instance::new(guiresources.backend());
