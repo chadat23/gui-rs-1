@@ -14,6 +14,8 @@ pub struct GUIWindow {
     pub size: GUISize,
     /// The minimum size of the window.
     pub min_size: GUISize,
+    /// The minimum size of the window.
+    pub max_size: GUISize,
     /// The background color for the window.
     pub background_color: GUIColor,
 }
@@ -23,10 +25,17 @@ impl Default for GUIWindow {
     fn default() -> GUIWindow {
         GUIWindow {
             title: "Form1",
-            size: GUISize::default(),
+            size: GUISize {
+                width: 500,
+                height: 500,
+            },
             min_size: GUISize {
                 width: 100,
                 height: 100,
+            },
+            max_size: GUISize {
+                width: 800,
+                height: 800,
             },
             background_color: GUIColor {
                 r: 0.4,
