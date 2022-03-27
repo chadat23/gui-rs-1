@@ -1,19 +1,20 @@
 use std::iter;
 
 use winit::dpi::PhysicalSize;
-use winit::event::{Event, ElementState, KeyboardInput, VirtualKeyCode, WindowEvent};
+use winit::event::{ElementState, Event, KeyboardInput, VirtualKeyCode, WindowEvent};
 use winit::event_loop::{ControlFlow, EventLoop};
 use winit::window::{Window, WindowBuilder};
 
-use crate::guiwidgets::GUIWindow;
+use crate::guiproperties::guiposition::GUISize;
 use crate::guiresources::GUIResources;
+use crate::guiwidgets::GUIWindow;
 
 struct State {
     surface: wgpu::Surface,
     device: wgpu::Device,
     queue: wgpu::Queue,
     config: wgpu::SurfaceConfiguration,
-    guiwindow: GUIWindow
+    guiwindow: GUIWindow,
 }
 
 impl State {
@@ -63,8 +64,11 @@ impl State {
             guiwindow,
         }
     }
-    fn resize(&mut self, new_size: winit::dpi::PhysicalSize<u32>) {
-        self.guiwindow.size = PhysicalSize { width: new_size.width, height: new_size.height };
+    fn resize(&mut self, new_size: GUISize) {
+        self.guiwindow.size = GUISize {
+            width: new_size.width,
+            height: new_size.height,
+        };
         self.config.width = new_size.width;
         self.config.height = new_size.height;
         self.surface.configure(&self.device, &self.config);
@@ -75,6 +79,7 @@ impl State {
         false
     }
 
+    #[warn(dead_code)]
     fn update(&mut self) {}
 
     fn render(&mut self) -> Result<(), wgpu::SurfaceError> {
@@ -97,10 +102,10 @@ impl State {
                     resolve_target: None,
                     ops: wgpu::Operations {
                         load: wgpu::LoadOp::Clear(wgpu::Color {
-                            r: 0.1,
-                            g: 0.2,
-                            b: 0.3,
-                            a: 1.0,
+                            r: self.guiwindow.background_color.r,
+                            g: self.guiwindow.background_color.g,
+                            b: self.guiwindow.background_color.b,
+                            a: self.guiwindow.background_color.a,
                         }),
                         store: true,
                     },
@@ -116,13 +121,19 @@ impl State {
     }
 }
 
-pub fn gui_processing(guiwindow: GUIWindow, guiresources: GUIResources) {
+pub fn run(guiwindow: GUIWindow, guiresources: GUIResources) {
     env_logger::init();
     let event_loop = EventLoop::new();
     let window = WindowBuilder::new().build(&event_loop).unwrap();
     window.set_title(guiwindow.title);
-    window.set_inner_size(PhysicalSize::new(guiwindow.size.width, guiwindow.size.height));
-    window.set_min_inner_size(Some(PhysicalSize::new(guiwindow.min_size.width, guiwindow.min_size.height)));
+    window.set_inner_size(PhysicalSize::new(
+        guiwindow.size.width,
+        guiwindow.size.height,
+    ));
+    window.set_min_inner_size(Some(PhysicalSize::new(
+        guiwindow.min_size.width,
+        guiwindow.min_size.height,
+    )));
 
     // State::new uses async code, so we're going to wait for it to finish
     let mut state: State = pollster::block_on(State::new(&window, guiwindow, guiresources));
@@ -147,12 +158,18 @@ pub fn gui_processing(guiwindow: GUIWindow, guiresources: GUIResources) {
                             ..
                         } => *control_flow = ControlFlow::Exit,
                         WindowEvent::Resized(physical_size) => {
-                            state.resize(*physical_size);
-                        },
+                            state.resize(GUISize {
+                                width: physical_size.width,
+                                height: physical_size.height,
+                            });
+                        }
                         WindowEvent::ScaleFactorChanged { new_inner_size, .. } => {
                             // new_inner_size is &&mut so w have to dereference it twice
-                            state.resize(**new_inner_size);
-                        },
+                            state.resize(GUISize {
+                                width: new_inner_size.width,
+                                height: new_inner_size.height,
+                            });
+                        }
                         _ => {}
                     }
                 }
@@ -162,7 +179,9 @@ pub fn gui_processing(guiwindow: GUIWindow, guiresources: GUIResources) {
                 match state.render() {
                     Ok(_) => {}
                     // Reconfigure the surface if lost
-                    Err(wgpu::SurfaceError::Lost) => state.resize(state.guiwindow.size),
+                    Err(wgpu::SurfaceError::Lost) => {
+                        state.guiwindow.size;
+                    }
                     // The system is out of memory, we should probably quit
                     Err(wgpu::SurfaceError::OutOfMemory) => *control_flow = ControlFlow::Exit,
                     // All other errors (Outdated, Timeout) should be resolved by the next frame

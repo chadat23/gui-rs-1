@@ -1,6 +1,5 @@
-use winit::dpi::PhysicalSize;
-
-use crate::guiposition::guilengths::GetLength;
+use crate::guiproperties::guicolor::GUIColor;
+use crate::guiproperties::guiposition::GUISize;
 
 /// Represents a gui window.
 /// Given the number of properties that a window has,
@@ -12,9 +11,11 @@ pub struct GUIWindow {
     // /// The tile of the window.
     pub title: &'static str,
     /// The size of the window.
-    pub size: winit::dpi::PhysicalSize<u32>,
+    pub size: GUISize,
     /// The minimum size of the window.
-    pub min_size: winit::dpi::PhysicalSize<u32>,
+    pub min_size: GUISize,
+    /// The background color for the window.
+    pub background_color: GUIColor,
 }
 
 impl Default for GUIWindow {
@@ -22,42 +23,44 @@ impl Default for GUIWindow {
     fn default() -> GUIWindow {
         GUIWindow {
             title: "Form1",
-            size: PhysicalSize { width: 500, height: 500 },
-            min_size: PhysicalSize { width: 100, height: 100 },
+            size: GUISize::default(),
+            min_size: GUISize {
+                width: 100,
+                height: 100,
+            },
+            background_color: GUIColor {
+                r: 0.4,
+                g: 0.4,
+                b: 0.4,
+                a: 1.0,
+            },
         }
     }
 }
 
 impl GUIWindow {
-    /// Sets the width of the window in units of logical pixels.
-    pub fn set_width(&mut self, width: impl GetLength) -> &mut Self {
-        self.size.width = width.get_length();
+    /// Set the size (width and height) of the window in units of logical pixels.
+    pub fn set_size(&mut self, size: GUISize) -> &mut Self {
+        self.size = size;
         self
     }
 
-    /// Sets the height of the window in units of logical pixels.
-    pub fn set_height(&mut self, height: impl GetLength) -> &mut Self {
-        self.size.height = height.get_length();
-        self
-    }
-
-    /// Sets the minimum width of the window in units of logical pixels.
-    pub fn set_min_width(&mut self, width: impl GetLength) -> &mut Self {
-        let width = width.get_length();
-        self.min_size.width = if width > 0 {width} else {1};
-        self
-    }
-
-    /// Sets the minimum height of the window in units of logical pixels.
-    pub fn set_min_height(&mut self, height: impl GetLength) -> &mut Self {
-        let height = height.get_length();
-        self.min_size.height = if height > 0 {height} else {1};
+    /// Set the minimum size (width and height) of the window in units of logical pixels.
+    pub fn set_min_size(&mut self, size: GUISize) -> &mut Self {
+        self.size = size;
         self
     }
 
     /// Sets the title of the window.
     pub fn set_title(&mut self, title: &'static str) -> &mut Self {
         self.title = title;
+        self
+    }
+
+    // Set background color of the window.
+    #[allow(non_snake_case)]
+    pub fn set_background_color(&mut self, color: GUIColor) -> &mut Self {
+        self.background_color = color;
         self
     }
 }
