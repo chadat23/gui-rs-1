@@ -1,4 +1,5 @@
 pub use guilengths::{GUIHeight, GUILength, GUIWidth};
+pub use guiposition::GUIPosition;
 pub use guisize::GUISize;
 
 /// A module of structs and tools for representing linear lengths.
@@ -92,6 +93,28 @@ mod guisize {
             GUISize {
                 width: width.get_length(),
                 height: height.get_length(),
+            }
+        }
+    }
+}
+
+mod guiposition {
+    use super::guilengths::{GUILength, GetLength};
+
+    pub struct GUIPosition {
+        pub x: u32,
+        pub y: u32,
+    }
+
+    impl GUIPosition {
+        pub fn new(x: u32, y: u32) -> Self {
+            GUIPosition { x, y }
+        }
+
+        pub fn from_lengths(x: GUILength, y: GUILength) -> Self {
+            GUIPosition {
+                x: x.get_length(),
+                y: y.get_length(),
             }
         }
     }
