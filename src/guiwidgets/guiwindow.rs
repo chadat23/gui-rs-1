@@ -1,7 +1,9 @@
-use crate::guiproperties::guitraits::{AreaWidget, Parent, Wind, Widget};
+use crate::guiproperties::guiposition::{GUIPosition, GUISize};
+use crate::guiproperties::guitraits::{
+    AreaChild, AreaFamily, AreaWidget, Parent, PointChild, Widget, Wind,
+};
 use crate::guiproperties::GUIColor;
 use crate::guiproperties::GUIIcon;
-use crate::guiproperties::guiposition::{GUIPosition, GUISize};
 
 /// Represents a gui window.
 /// Given the number of properties that a window has,
@@ -28,8 +30,10 @@ pub struct GUIWindow {
     pub ime_position: Option<GUIPosition>,
     /// The background color for the window.
     pub background_color: GUIColor,
-    /// A list of child widgets
-    pub children: Option<Vec<Box<dyn Parent>>>,
+    /// A list of child widgets that have an area
+    pub area_children: Option<Vec<Box<dyn AreaFamily>>>,
+    /// A list of child widgets that don't have an area
+    pub point_children: Option<Vec<Box<dyn PointChild>>>,
 }
 
 impl Default for GUIWindow {
@@ -59,68 +63,95 @@ impl Default for GUIWindow {
                 b: 0.4,
                 a: 1.0,
             },
-            children: None,
+            area_children: None,
+            point_children: None,
         }
     }
 }
 
-impl Widget for GUIWindow {}
+impl Widget for GUIWindow {
+    fn is_rendered(&self) -> bool {
+        true
+    }
+}
 
 impl AreaWidget for GUIWindow {
     /// Set the size (width and height) of the window in units of logical pixels.
-    fn set_size(&mut self, size: GUISize) -> &mut Self {
+    fn set_size(&mut self, size: GUISize) {
         self.size = size;
-        self
-    } 
-    
+    }
+
     // Set background color of the window.
-    fn set_background_color(&mut self, color: GUIColor) -> &mut Self {
+    fn set_background_color(&mut self, color: GUIColor) {
         self.background_color = color;
-        self
     }
 }
 
 impl Wind for GUIWindow {
     /// Set the minimum size (width and height) of the window in units of logical pixels.
-    fn set_min_size(&mut self, size: GUISize) -> &mut Self {
+    fn set_min_size(&mut self, size: GUISize) {
         self.size = size;
-        self
     }
 
     /// Sets the title of the window.
-    fn set_title(&mut self, title: &'static str) -> &mut Self {
+    fn set_title(&mut self, title: &'static str) {
         self.title = title;
-        self
     }
 
     // Set whether or not a window is resizable.
-    fn is_resizable(&mut self, resizable: bool) -> &mut Self {
+    fn set_resizable(&mut self, resizable: bool) {
         self.resizable = resizable;
-        self
     }
 
     // Set whether or not a window is always on top.
-    fn is_always_on_top(&mut self, always_on_top: bool) -> &mut Self {
+    fn set_always_on_top(&mut self, always_on_top: bool) {
         self.always_on_top = always_on_top;
-        self
     }
 
     // Sets the window icon.
-    fn set_window_icon(&mut self, icon: GUIIcon) -> &mut Self {
+    fn set_window_icon(&mut self, icon: GUIIcon) {
         self.window_icon = Some(icon);
-        self
     }
 }
 
 impl Parent for GUIWindow {
-    fn add_child(&mut self, child: Box<dyn Parent>) {
-        match self.children {
+    /// Adds a child to the GUIWindow.
+    /// Children, and grandchildren will be rendered in the order
+    /// in which they're added so children that should be
+    /// visually obscured by other children should be added
+    /// before the obscuring children.
+    fn add_area_child(&mut self, child: Box<dyn AreaFamily>) {
+        match &mut self.area_children {
             Some(children) => {
                 children.push(child);
             }
             _ => {
-                self.children = Some(Vec::from([child]));
+                self.area_children = Some(Vec::from([child]));
             }
         };
+    }
+
+    fn add_point_child(&mut self, child: Box<dyn PointChild>) {
+        match &mut self.point_children {
+            Some(children) => {
+                children.push(child);
+            }
+            _ => {
+                self.point_children = Some(Vec::from([child]));
+            }
+        };
+    }
+
+    /// Returns the number of children.
+    fn children_len(&self) -> usize {
+        match &self.area_children {
+            Some(children) => children.len(),
+            None => 0,
+        }
+    }
+
+    /// Gets the children.
+    fn get_area_children(&self) -> &Option<Vec<Box<dyn AreaFamily>>> {
+        &self.area_children
     }
 }

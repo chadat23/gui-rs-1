@@ -8,7 +8,7 @@ use crate::guiwidgets::GUIWindow;
 
 mod state;
 pub mod vertices;
-mod window_building_utils;
+pub mod window_building_utils;
 
 use state::State;
 

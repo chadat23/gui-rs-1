@@ -10,7 +10,7 @@ pub mod arcs {
     /// fascets is the number of fascets in the arc, so one quater of the
     /// number of fascets that's be in a similarly detialed circle.
     /// The bottom right most vertice is the first with them in counter clockwise order.
-    pub fn make_top_right_arc(radius: f64, fascets: u8) -> Vec<GUIPosition> {
+    pub fn make_top_right_arc(radius: f64, fascets: usize) -> Vec<GUIPosition> {
         let vertices = (fascets + 1) as usize;
         let mut positions = Vec::with_capacity(vertices);
 
@@ -31,7 +31,7 @@ pub mod arcs {
     /// fascets is the number of fascets in the arc, so one quater of the
     /// number of fascets that's be in a similarly detialed circle.
     /// The top right most vertice is the first with them in counter clockwise order.
-    pub fn make_top_left_arc(radius: f64, fascets: u8) -> Vec<GUIPosition> {
+    pub fn make_top_left_arc(radius: f64, fascets: usize) -> Vec<GUIPosition> {
         let mut top_right = make_top_right_arc(radius, fascets);
         top_right.reverse();
         top_right
@@ -48,7 +48,7 @@ pub mod arcs {
     /// fascets is the number of fascets in the arc, so one quater of the
     /// number of fascets that's be in a similarly detialed circle.
     /// The bottom left most vertice is the first with them in counter clockwise order.
-    pub fn make_bottom_right_arc(radius: f64, fascets: u8) -> Vec<GUIPosition> {
+    pub fn make_bottom_right_arc(radius: f64, fascets: usize) -> Vec<GUIPosition> {
         let mut top_right = make_top_right_arc(radius, fascets);
         top_right.reverse();
         top_right
@@ -65,7 +65,7 @@ pub mod arcs {
     /// fascets is the number of fascets in the arc, so one quater of the
     /// number of fascets that's be in a similarly detialed circle.
     /// The top left most vertice is the first with them in counter clockwise order.
-    pub fn make_bottom_left_arc(radius: f64, fascets: u8) -> Vec<GUIPosition> {
+    pub fn make_bottom_left_arc(radius: f64, fascets: usize) -> Vec<GUIPosition> {
         let top_right = make_top_right_arc(radius, fascets);
         top_right
             .iter()

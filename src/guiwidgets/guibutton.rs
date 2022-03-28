@@ -1,6 +1,8 @@
 use crate::guiprocessing::vertices::Vertex;
 use crate::guiproperties::guiposition::{GUILength, GUISize};
-use crate::guiproperties::guitraits::{Child, Parent, Widget};
+use crate::guiproperties::guitraits::{
+    AreaChild, AreaFamily, AreaWidget, Child, Parent, PointChild, Widget,
+};
 use crate::guiproperties::{GUIColor, GUIPolygon};
 use crate::guiwidgets::{widget_utils, widget_utils::arcs};
 
@@ -15,9 +17,11 @@ pub struct GUIButton {
     pub radius: GUILength,
     /// The background color for the button.
     pub background_color: GUIColor,
-    pub polygon: Option<GUIPolygon>,
+    // pub polygon: Option<GUIPolygon>,
     /// A list of child widgets
-    pub children: Option<Vec<Box<dyn Parent>>>,
+    pub area_children: Option<Vec<Box<dyn AreaFamily>>>,
+    /// A list of child widgets
+    pub point_children: Option<Vec<Box<dyn PointChild>>>,
 }
 
 impl Default for GUIButton {
@@ -36,98 +40,94 @@ impl Default for GUIButton {
                 b: 0.4,
                 a: 1.0,
             },
-            polygon: None,
-            children: None,
+            // polygon: None,
+            point_children: None,
+            area_children: None,
         }
     }
 }
 
-impl Widget for GUIButton {}
+impl Widget for GUIButton {
+    fn is_rendered(&self) -> bool {
+        true
+    }
+}
+
+impl AreaWidget for GUIButton {
+    /// Set the size (width and height) of the window in units of logical pixels.
+    fn set_size(&mut self, size: GUISize) {
+        self.size = size;
+    }
+
+    // Set background color of the window.
+    fn set_background_color(&mut self, color: GUIColor) {
+        self.background_color = color;
+    }
+}
 
 impl Parent for GUIButton {
-    fn add_child(&mut self, child: Box<dyn Parent>) {
-        match self.children {
+    /// Adds a child to the GUIWindow.
+    /// Children, and grandchildren will be rendered in the order
+    /// in which they're added so children that should be
+    /// visually obscured by other children should be added
+    /// before the obscuring children.
+    fn add_area_child(&mut self, child: Box<dyn AreaFamily>) {
+        match &mut self.area_children {
             Some(children) => {
                 children.push(child);
             }
             _ => {
-                self.children = Some(Vec::from([child]));
+                self.area_children = Some(Vec::from([child]));
             }
         };
+    }
+
+    fn add_point_child(&mut self, child: Box<dyn PointChild>) {
+        match &mut self.point_children {
+            Some(children) => {
+                children.push(child);
+            }
+            _ => {
+                self.point_children = Some(Vec::from([child]));
+            }
+        };
+    }
+
+    /// Returns the number of children.
+    fn children_len(&self) -> usize {
+        match &self.area_children {
+            Some(children) => children.len(),
+            None => 0,
+        }
+    }
+
+    /// Gets the children.
+    fn get_area_children(&self) -> &Option<Vec<Box<dyn AreaFamily>>> {
+        &self.area_children
     }
 }
 
 impl Child for GUIButton {}
 
-impl GUIButton {
-    pub fn vertices(&mut self) -> Vec<Vertex> {
-        let polygon = match &self.polygon {
-            Some(polygon) => polygon,
-            None => {
-                &self.make_polygon();
-                match &self.polygon {
-                    Some(polygon) => polygon,
-                    None => {
-                        todo!()
-                    }
-                }
-                // &self.polygon.unwrap()
-            }
-        };
-
-        let vertices: Vec<Vertex> = polygon
-            .vertices
-            .iter()
-            .map(|position| Vertex {
-                position: [position.x as f32 / 50., position.y as f32 / 50., 0.],
-                color: [
-                    self.background_color.r as f32,
-                    self.background_color.g as f32,
-                    self.background_color.b as f32,
-                ],
-            })
-            .collect();
-
-        vertices
-    }
-
-    pub fn indices(&mut self) -> Vec<u16> {
-        let polygon = match &self.polygon {
-            Some(polygon) => polygon,
-            None => {
-                &self.make_polygon();
-                match &self.polygon {
-                    Some(polygon) => polygon,
-                    None => {
-                        todo!()
-                    }
-                }
-                // &self.polygon.unwrap()
-            }
-        };
-
-        polygon.indices.iter().map(|i| *i).collect()
-    }
-
-    pub fn make_polygon(&mut self) {
-        let fascets = 4;
-
-        let top_left_radius = arcs::make_top_left_arc(self.radius.length, fascets);
+impl AreaChild for GUIButton {
+    fn get_vertices_and_indices(&self) -> (Vec<Vertex>, Vec<u16>) {
+        const RADIUS_FASCETS: usize = 10;
+        let top_left_radius = arcs::make_top_left_arc(self.radius.length, RADIUS_FASCETS);
         let mut top_left_radius =
             widget_utils::transpose(top_left_radius, &self.radius, &self.radius.negative());
 
-        let top_right_radius = arcs::make_top_right_arc(self.radius.length, fascets);
+        let top_right_radius = arcs::make_top_right_arc(self.radius.length, RADIUS_FASCETS);
         let top_right_radius = widget_utils::transpose(
             top_right_radius,
             &GUILength::zero(),
             &self.radius.negative(),
         );
 
-        let bottom_left_radius = arcs::make_bottom_left_arc(self.radius.length, fascets);
+        let bottom_left_radius = arcs::make_bottom_left_arc(self.radius.length, RADIUS_FASCETS);
         let bottom_left_radius =
             widget_utils::transpose(bottom_left_radius, &self.radius, &GUILength::zero());
 
-        let bottom_right_radius = arcs::make_bottom_right_arc(self.radius.length, fascets);
+        let bottom_right_radius = arcs::make_bottom_right_arc(self.radius.length, RADIUS_FASCETS);
         let bottom_right_radius =
             widget_utils::transpose(bottom_right_radius, &self.radius, &GUILength::zero());
 
@@ -135,20 +135,27 @@ impl GUIButton {
         top_left_radius.extend(bottom_right_radius);
         top_left_radius.extend(bottom_left_radius);
 
-        let number_of_triangles = (top_left_radius.len() - 2) * 3;
-
-        let mut indices: Vec<u16> = Vec::with_capacity(number_of_triangles);
-        for triangle_index in 0..number_of_triangles {
+        let mut vertices = Vec::with_capacity(top_left_radius.len());
+        for position in top_left_radius.iter() {
+            vertices.push(Vertex {
+                position: [position.x as f32, position.y as f32, 0.],
+                color: [
+                    self.background_color.r as f32,
+                    self.background_color.g as f32,
+                    self.background_color.b as f32,
+                ],
+            });
+        }
+        let number_of_triangles = top_left_radius.len() - 2;
+        let mut indices = Vec::with_capacity(number_of_triangles * 3);
+        for i in 0..number_of_triangles {
             indices.push(0);
-            indices.push((triangle_index + 1) as u16);
-            indices.push((triangle_index + 2) as u16);
+            indices.push((i + 1) as u16);
+            indices.push((i + 2) as u16);
         }
 
-        self.polygon = Some(GUIPolygon {
-            // vertices: &top_left_radius[..],
-            // indices: &indices[..],
-            vertices: top_left_radius,
-            indices: indices,
-        })
+        (vertices, indices)
     }
 }
+
+impl AreaFamily for GUIButton {}
