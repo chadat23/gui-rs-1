@@ -1,4 +1,5 @@
 /// Represents a color and opacity.
+#[derive(Clone, Copy)]
 pub struct GUIColor {
     pub r: f64,
     pub g: f64,

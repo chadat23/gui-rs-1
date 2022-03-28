@@ -1,6 +1,7 @@
 use crate::guiproperties::guicolor::GUIColor;
 use crate::guiproperties::guiicon::GUIIcon;
 use crate::guiproperties::guiposition::{GUIPosition, GUISize};
+use crate::guiwidgets::GUIButton;
 
 /// Represents a gui window.
 /// Given the number of properties that a window has,
@@ -27,6 +28,8 @@ pub struct GUIWindow {
     pub ime_position: Option<GUIPosition>,
     /// The background color for the window.
     pub background_color: GUIColor,
+    /// A list of
+    pub buttons: Option<GUIButton>,
 }
 
 impl Default for GUIWindow {
@@ -35,16 +38,16 @@ impl Default for GUIWindow {
         GUIWindow {
             title: "Form1",
             size: GUISize {
-                width: 500,
-                height: 500,
+                width: 500.,
+                height: 500.,
             },
             min_size: GUISize {
-                width: 100,
-                height: 100,
+                width: 100.,
+                height: 100.,
             },
             max_size: GUISize {
-                width: 800,
-                height: 800,
+                width: 800.,
+                height: 800.,
             },
             resizable: true,
             always_on_top: false,
@@ -56,6 +59,7 @@ impl Default for GUIWindow {
                 b: 0.4,
                 a: 1.0,
             },
+            buttons: None,
         }
     }
 }

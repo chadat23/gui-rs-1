@@ -6,9 +6,10 @@ use winit::window::Window;
 
 use crate::guiproperties::guiposition::GUISize;
 use crate::guiresources::GUIResources;
-use crate::guiwidgets::GUIWindow;
+use crate::guiwidgets::{GUIButton, GUIWindow};
 
-use crate::guiprocessing::vertices::{Vertex, INDICES, VERTICES};
+use crate::guiprocessing::vertices::Vertex;
+// use crate::guiprocessing::vertices::{Vertex, INDICES, VERTICES};
 
 pub struct State {
     surface: wgpu::Surface,
@@ -63,8 +64,8 @@ impl State {
         let config = wgpu::SurfaceConfiguration {
             usage: wgpu::TextureUsages::RENDER_ATTACHMENT,
             format: surface.get_preferred_format(&adapter).unwrap(),
-            width: guiwindow.size.width,
-            height: guiwindow.size.height,
+            width: guiwindow.size.get_width_in_pixels(),
+            height: guiwindow.size.get_height_in_pixels(),
             present_mode: wgpu::PresentMode::Fifo,
         };
         surface.configure(&device, &config);
@@ -124,17 +125,32 @@ impl State {
             multiview: None,
         });
 
+        // let mut button = &guiwindow.buttons.unwrap();
+        let mut button = match guiwindow.buttons {
+            Some(ref button) => GUIButton {
+                text: button.text.clone(),
+                size: button.size.clone(),
+                radius: button.radius.clone(),
+                background_color: button.background_color.clone(),
+                polygon: button.polygon.clone(),
+            },
+            None => todo!(),
+        };
+
         let vertex_buffer = device.create_buffer_init(&wgpu::util::BufferInitDescriptor {
             label: Some("Vertex Buffer"),
-            contents: bytemuck::cast_slice(VERTICES),
+            // contents: bytemuck::cast_slice(VERTICES),
+            contents: bytemuck::cast_slice(&button.vertices()[..]),
             usage: wgpu::BufferUsages::VERTEX,
         });
         let index_buffer = device.create_buffer_init(&wgpu::util::BufferInitDescriptor {
             label: Some("Index Buffer"),
-            contents: bytemuck::cast_slice(INDICES),
+            // contents: bytemuck::cast_slice(INDICES),
+            contents: bytemuck::cast_slice(&button.indices()[..]),
             usage: wgpu::BufferUsages::INDEX,
         });
-        let num_indices = INDICES.len() as u32;
+        // let num_indices = INDICES.len() as u32;
+        let num_indices = button.indices().len() as u32;
 
         let num_vertices = 16;
         let angle = std::f32::consts::PI * 2.0 / num_vertices as f32;
@@ -190,10 +206,8 @@ impl State {
             width: new_size.width,
             height: new_size.height,
         };
-        self.config.width = new_size.width;
-        self.config.height = new_size.height;
-        // self.config.width = self.guiwindow.max_size.width;
-        // self.config.height = self.guiwindow.max_size.height;
+        self.config.width = new_size.get_width_in_pixels();
+        self.config.height = new_size.get_height_in_pixels();
         self.surface.configure(&self.device, &self.config);
     }
 

@@ -7,12 +7,10 @@ use crate::guiresources::GUIResources;
 use crate::guiwidgets::GUIWindow;
 
 mod state;
-mod vertices;
+pub mod vertices;
 mod window_building_utils;
 
 use state::State;
-
-// use vertices::{Vertex, VERTICES, INDICES};
 
 /// The main funciton that executes everthing.
 pub fn run(guiwindow: GUIWindow, guiresources: GUIResources) {
@@ -44,15 +42,15 @@ pub fn run(guiwindow: GUIWindow, guiresources: GUIResources) {
                         } => *control_flow = ControlFlow::Exit,
                         WindowEvent::Resized(physical_size) => {
                             state.resize(GUISize {
-                                width: physical_size.width,
-                                height: physical_size.height,
+                                width: physical_size.width as f64,
+                                height: physical_size.height as f64,
                             });
                         }
                         WindowEvent::ScaleFactorChanged { new_inner_size, .. } => {
                             // new_inner_size is &&mut so w have to dereference it twice
                             state.resize(GUISize {
-                                width: new_inner_size.width,
-                                height: new_inner_size.height,
+                                width: new_inner_size.width as f64,
+                                height: new_inner_size.height as f64,
                             });
                         }
                         _ => {}
@@ -62,7 +60,9 @@ pub fn run(guiwindow: GUIWindow, guiresources: GUIResources) {
             Event::RedrawRequested(window_id) if window_id == window.id() => {
                 // state.update();
                 match state.render() {
-                    Ok(_) => {}
+                    Ok(_) => {
+                        println!("good!")
+                    }
                     // Reconfigure the surface if lost
                     Err(wgpu::SurfaceError::Lost) => {
                         state.guiwindow.size;
