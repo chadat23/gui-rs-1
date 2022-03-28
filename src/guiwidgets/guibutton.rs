@@ -1,7 +1,7 @@
 use crate::guiprocessing::vertices::Vertex;
-use crate::guiproperties::guicolor::GUIColor;
-use crate::guiproperties::guipolygon::GUIPolygon;
 use crate::guiproperties::guiposition::{GUILength, GUISize};
+use crate::guiproperties::guitraits::{Child, Parent, Widget};
+use crate::guiproperties::{GUIColor, GUIPolygon};
 use crate::guiwidgets::{widget_utils, widget_utils::arcs};
 
 /// Represents a gui button.
@@ -16,6 +16,8 @@ pub struct GUIButton {
     /// The background color for the button.
     pub background_color: GUIColor,
     pub polygon: Option<GUIPolygon>,
+    /// A list of child widgets
+    pub children: Option<Vec<Box<dyn Parent>>>,
 }
 
 impl Default for GUIButton {
@@ -35,9 +37,27 @@ impl Default for GUIButton {
                 a: 1.0,
             },
             polygon: None,
+            children: None,
         }
     }
 }
+
+impl Widget for GUIButton {}
+
+impl Parent for GUIButton {
+    fn add_child(&mut self, child: Box<dyn Parent>) {
+        match self.children {
+            Some(children) => {
+                children.push(child);
+            }
+            _ => {
+                self.children = Some(Vec::from([child]));
+            }
+        };
+    }
+}
+
+impl Child for GUIButton {}
 
 impl GUIButton {
     pub fn vertices(&mut self) -> Vec<Vertex> {

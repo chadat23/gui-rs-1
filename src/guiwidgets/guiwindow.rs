@@ -1,7 +1,7 @@
-use crate::guiproperties::guicolor::GUIColor;
-use crate::guiproperties::guiicon::GUIIcon;
+use crate::guiproperties::guitraits::{AreaWidget, Parent, Wind, Widget};
+use crate::guiproperties::GUIColor;
+use crate::guiproperties::GUIIcon;
 use crate::guiproperties::guiposition::{GUIPosition, GUISize};
-use crate::guiwidgets::GUIButton;
 
 /// Represents a gui window.
 /// Given the number of properties that a window has,
@@ -28,8 +28,8 @@ pub struct GUIWindow {
     pub ime_position: Option<GUIPosition>,
     /// The background color for the window.
     pub background_color: GUIColor,
-    /// A list of
-    pub buttons: Option<GUIButton>,
+    /// A list of child widgets
+    pub children: Option<Vec<Box<dyn Parent>>>,
 }
 
 impl Default for GUIWindow {
@@ -59,52 +59,68 @@ impl Default for GUIWindow {
                 b: 0.4,
                 a: 1.0,
             },
-            buttons: None,
+            children: None,
         }
     }
 }
 
-impl GUIWindow {
+impl Widget for GUIWindow {}
+
+impl AreaWidget for GUIWindow {
     /// Set the size (width and height) of the window in units of logical pixels.
-    pub fn set_size(&mut self, size: GUISize) -> &mut Self {
+    fn set_size(&mut self, size: GUISize) -> &mut Self {
         self.size = size;
         self
+    } 
+    
+    // Set background color of the window.
+    fn set_background_color(&mut self, color: GUIColor) -> &mut Self {
+        self.background_color = color;
+        self
     }
+}
 
+impl Wind for GUIWindow {
     /// Set the minimum size (width and height) of the window in units of logical pixels.
-    pub fn set_min_size(&mut self, size: GUISize) -> &mut Self {
+    fn set_min_size(&mut self, size: GUISize) -> &mut Self {
         self.size = size;
         self
     }
 
     /// Sets the title of the window.
-    pub fn set_title(&mut self, title: &'static str) -> &mut Self {
+    fn set_title(&mut self, title: &'static str) -> &mut Self {
         self.title = title;
         self
     }
 
-    // Set background color of the window.
-    #[allow(non_snake_case)]
-    pub fn set_background_color(&mut self, color: GUIColor) -> &mut Self {
-        self.background_color = color;
-        self
-    }
-
     // Set whether or not a window is resizable.
-    pub fn is_resizable(&mut self, resizable: bool) -> &mut Self {
+    fn is_resizable(&mut self, resizable: bool) -> &mut Self {
         self.resizable = resizable;
         self
     }
 
     // Set whether or not a window is always on top.
-    pub fn is_always_on_top(&mut self, always_on_top: bool) -> &mut Self {
+    fn is_always_on_top(&mut self, always_on_top: bool) -> &mut Self {
         self.always_on_top = always_on_top;
         self
     }
 
     // Sets the window icon.
-    pub fn set_window_icon(&mut self, icon: GUIIcon) -> &mut Self {
+    fn set_window_icon(&mut self, icon: GUIIcon) -> &mut Self {
         self.window_icon = Some(icon);
         self
+    }
+}
+
+impl Parent for GUIWindow {
+    fn add_child(&mut self, child: Box<dyn Parent>) {
+        match self.children {
+            Some(children) => {
+                children.push(child);
+            }
+            _ => {
+                self.children = Some(Vec::from([child]));
+            }
+        };
     }
 }
