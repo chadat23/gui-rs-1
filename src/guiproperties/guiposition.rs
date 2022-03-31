@@ -21,7 +21,10 @@ pub mod guilengths {
 
     impl Default for GUILength {
         fn default() -> Self {
-            GUILength { length: 0., length_type: LengthType::LogicalSize }
+            GUILength {
+                length: 0.,
+                length_type: LengthType::LogicalSize,
+            }
         }
     }
 
@@ -30,7 +33,8 @@ pub mod guilengths {
             let decimal_places = 8f64;
             let multiplyer = (10f64).powf(decimal_places);
 
-            (self.length * multiplyer) as u64 == (other.length * multiplyer) as u64 && self.length_type == other.length_type
+            (self.length * multiplyer) as u64 == (other.length * multiplyer) as u64
+                && self.length_type == other.length_type
         }
     }
 
@@ -65,14 +69,14 @@ pub mod guilengths {
         pub fn from_logical_pixels(pixels: f64) -> Self {
             GUILength {
                 length: pixels,
-                length_type: LengthType::LogicalSize
+                length_type: LengthType::LogicalSize,
             }
         }
 
         pub fn from_physical_pixels(pixels: f64) -> Self {
             GUILength {
                 length: pixels,
-                length_type: LengthType::PhysicalSize
+                length_type: LengthType::PhysicalSize,
             }
         }
     }
@@ -80,7 +84,7 @@ pub mod guilengths {
 
 /// A module of structs and tools for representing areas, width and height.
 mod guisize {
-use super::guilengths::{GUILength, LengthType};
+    use super::guilengths::{GUILength, LengthType};
 
     /// Represents an area (width and height)
     #[derive(Copy, Clone, Debug)]
@@ -97,10 +101,7 @@ use super::guilengths::{GUILength, LengthType};
 
     impl GUISize {
         pub fn from_lengths(width: GUILength, height: GUILength) -> Self {
-            GUISize {
-                width,
-                height,
-            }
+            GUISize { width, height }
         }
 
         pub fn from_logical_pixels(width: f64, height: f64) -> Self {
@@ -140,10 +141,7 @@ mod guiposition {
         }
 
         pub fn from_lengths(x: GUILength, y: GUILength) -> Self {
-            GUIPosition {
-                x,
-                y,
-            }
+            GUIPosition { x, y }
         }
 
         pub fn from_logical_pixels(x: f64, y: f64) -> Self {

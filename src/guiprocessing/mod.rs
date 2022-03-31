@@ -2,7 +2,7 @@ use winit::event::{ElementState, Event, KeyboardInput, VirtualKeyCode, WindowEve
 use winit::event_loop::{ControlFlow, EventLoop};
 use winit::window::WindowBuilder;
 
-use crate::guiproperties::guiposition::{GUISize, GUILength};
+use crate::guiproperties::guiposition::GUISize;
 use crate::guiresources::GUIResources;
 use crate::guiwidgets::GUIWindow;
 
@@ -43,17 +43,17 @@ pub fn run(mut guiwindow: GUIWindow, guiresources: GUIResources) {
                             ..
                         } => *control_flow = ControlFlow::Exit,
                         WindowEvent::Resized(physical_size) => {
-                            state.resize(GUISize {
-                                width: GUILength::from_physical_pixels(physical_size.width as f64),
-                                height: GUILength::from_physical_pixels(physical_size.height as f64),
-                            });
+                            state.resize(GUISize::from_physical_pixels(
+                                physical_size.width as f64,
+                                physical_size.height as f64,
+                            ));
                         }
                         WindowEvent::ScaleFactorChanged { new_inner_size, .. } => {
                             // new_inner_size is &&mut so w have to dereference it twice
-                            state.resize(GUISize {
-                                width: GUILength::from_physical_pixels(new_inner_size.width as f64),
-                                height: GUILength::from_physical_pixels(new_inner_size.height as f64),
-                            });
+                            state.resize(GUISize::from_physical_pixels(
+                                new_inner_size.width as f64,
+                                new_inner_size.height as f64,
+                            ));
                         }
                         _ => {}
                     }

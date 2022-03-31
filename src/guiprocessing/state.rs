@@ -60,8 +60,14 @@ impl State {
         let config = wgpu::SurfaceConfiguration {
             usage: wgpu::TextureUsages::RENDER_ATTACHMENT,
             format: surface.get_preferred_format(&adapter).unwrap(),
-            width: guiwindow.size.width.get_physical_length(guiwindow.logical_scale.unwrap()) as u32,
-            height: guiwindow.size.height.get_physical_length(guiwindow.logical_scale.unwrap()) as u32,
+            width: guiwindow
+                .size
+                .width
+                .get_physical_length(guiwindow.logical_scale.unwrap()) as u32,
+            height: guiwindow
+                .size
+                .height
+                .get_physical_length(guiwindow.logical_scale.unwrap()) as u32,
             present_mode: wgpu::PresentMode::Fifo,
         };
         surface.configure(&device, &config);
@@ -121,7 +127,10 @@ impl State {
             multiview: None,
         });
 
-        let (vertices, indices) = window_building_utils::we_will_see(&guiwindow.area_children, guiwindow.logical_scale.unwrap());
+        let (vertices, indices) = window_building_utils::make_vertices_and_indices(
+            &guiwindow.area_children,
+            guiwindow.logical_scale.unwrap(),
+        );
 
         let vertex_buffer = device.create_buffer_init(&wgpu::util::BufferInitDescriptor {
             label: Some("Vertex Buffer"),
@@ -155,8 +164,16 @@ impl State {
             width: new_size.width,
             height: new_size.height,
         };
-        self.config.width = self.guiwindow.size.width.get_physical_length(self.guiwindow.logical_scale.unwrap()) as u32;
-        self.config.height = self.guiwindow.size.height.get_physical_length(self.guiwindow.logical_scale.unwrap()) as u32;
+        self.config.width =
+            self.guiwindow
+                .size
+                .width
+                .get_physical_length(self.guiwindow.logical_scale.unwrap()) as u32;
+        self.config.height =
+            self.guiwindow
+                .size
+                .height
+                .get_physical_length(self.guiwindow.logical_scale.unwrap()) as u32;
         self.surface.configure(&self.device, &self.config);
     }
 

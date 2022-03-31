@@ -9,21 +9,42 @@ pub fn set_window_properties(window: Window, guiwindow: &GUIWindow) -> Window {
     window.set_title(guiwindow.title);
     // window.set_inner_size(PhysicalSize::new(width: 8, height: 8));
     window.set_inner_size(PhysicalSize::new(
-        guiwindow.size.width.get_physical_length(guiwindow.logical_scale.unwrap()) as u32,
-        guiwindow.size.height.get_physical_length(guiwindow.logical_scale.unwrap()) as u32,
+        guiwindow
+            .size
+            .width
+            .get_physical_length(guiwindow.logical_scale.unwrap()) as u32,
+        guiwindow
+            .size
+            .height
+            .get_physical_length(guiwindow.logical_scale.unwrap()) as u32,
     ));
     window.set_min_inner_size(Some(PhysicalSize::new(
-        guiwindow.min_size.width.get_physical_length(guiwindow.logical_scale.unwrap()) as u32,
-        guiwindow.min_size.height.get_physical_length(guiwindow.logical_scale.unwrap()) as u32,
+        guiwindow
+            .min_size
+            .width
+            .get_physical_length(guiwindow.logical_scale.unwrap()) as u32,
+        guiwindow
+            .min_size
+            .height
+            .get_physical_length(guiwindow.logical_scale.unwrap()) as u32,
     )));
     window.set_max_inner_size(Some(PhysicalSize::new(
-        guiwindow.max_size.width.get_physical_length(guiwindow.logical_scale.unwrap()) as u32,
-        guiwindow.max_size.height.get_physical_length(guiwindow.logical_scale.unwrap()) as u32,
+        guiwindow
+            .max_size
+            .width
+            .get_physical_length(guiwindow.logical_scale.unwrap()) as u32,
+        guiwindow
+            .max_size
+            .height
+            .get_physical_length(guiwindow.logical_scale.unwrap()) as u32,
     )));
     window
 }
 
-pub fn we_will_see(children: &Option<Vec<Box<dyn AreaFamily>>>, scale: f64) -> (Vec<Vertex>, Vec<u16>) {
+pub fn make_vertices_and_indices(
+    children: &Option<Vec<Box<dyn AreaFamily>>>,
+    scale: f64,
+) -> (Vec<Vertex>, Vec<u16>) {
     let mut all_vertices: Vec<Vertex> = Vec::new();
     let mut all_indices: Vec<u16> = Vec::new();
     match children {

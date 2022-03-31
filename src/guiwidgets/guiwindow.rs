@@ -1,10 +1,10 @@
-use  winit::window::Window;
+use winit::window::Window;
 
+use crate::guiproperties::guiposition::GUILength;
 use crate::guiproperties::guiposition::{GUIPosition, GUISize};
 use crate::guiproperties::guitraits::{AreaFamily, AreaWidget, Parent, PointChild, Widget, Wind};
 use crate::guiproperties::GUIColor;
 use crate::guiproperties::GUIIcon;
-use crate::guiproperties::guiposition::GUILength;
 
 /// Represents a gui window.
 /// Given the number of properties that a window has,

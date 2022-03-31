@@ -1,7 +1,7 @@
-use crate::guiproperties::guiposition::{GUIPosition, GUILength};
+use crate::guiproperties::guiposition::{GUILength, GUIPosition};
 
 pub mod arcs {
-    use crate::guiproperties::guiposition::{GUIPosition, GUILength};
+    use crate::guiproperties::guiposition::{GUILength, GUIPosition};
 
     const PI: f64 = 3.141592653589793238;
 
@@ -100,7 +100,9 @@ pub fn translate(
     dx: &GUILength,
     dy: &GUILength,
 ) -> Vec<GUIPosition> {
-    if (vertices[0].x.length_type == dx.length_type || vertices[0].x.length == 0.) && (vertices[0].y.length_type == dy.length_type || vertices[0].y.length == 0.) {
+    if (vertices[0].x.length_type == dx.length_type || vertices[0].x.length == 0.)
+        && (vertices[0].y.length_type == dy.length_type || vertices[0].y.length == 0.)
+    {
         for vertice in vertices.iter_mut() {
             vertice.x.length += dx.length;
             vertice.y.length += dy.length;

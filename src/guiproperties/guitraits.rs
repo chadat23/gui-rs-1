@@ -51,4 +51,4 @@ pub trait AreaChild: Child {
 
 pub trait AreaFamily: AreaChild + Parent + AreaWidget {}
 
-pub trait PointChild: Child {} 
+pub trait PointChild: Child {}

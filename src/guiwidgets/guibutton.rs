@@ -138,7 +138,11 @@ impl AreaChild for GUIButton {
         let mut vertices = Vec::with_capacity(top_left_radius.len());
         for position in top_left_radius.iter() {
             vertices.push(Vertex {
-                position: [position.x.get_physical_length(scale) as f32, position.y.get_physical_length(scale) as f32, 0.],
+                position: [
+                    position.x.get_physical_length(scale) as f32,
+                    position.y.get_physical_length(scale) as f32,
+                    0.,
+                ],
                 color: [
                     self.background_color.r as f32,
                     self.background_color.g as f32,
