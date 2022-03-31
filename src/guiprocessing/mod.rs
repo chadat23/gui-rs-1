@@ -2,7 +2,7 @@ use winit::event::{ElementState, Event, KeyboardInput, VirtualKeyCode, WindowEve
 use winit::event_loop::{ControlFlow, EventLoop};
 use winit::window::WindowBuilder;
 
-use crate::guiproperties::guiposition::GUISize;
+use crate::guiproperties::guiposition::{GUISize, GUILength};
 use crate::guiresources::GUIResources;
 use crate::guiwidgets::GUIWindow;
 
@@ -13,10 +13,12 @@ pub mod window_building_utils;
 use state::State;
 
 /// The main funciton that executes everthing.
-pub fn run(guiwindow: GUIWindow, guiresources: GUIResources) {
+pub fn run(mut guiwindow: GUIWindow, guiresources: GUIResources) {
     env_logger::init();
     let event_loop = EventLoop::new();
     let window = WindowBuilder::new().build(&event_loop).unwrap();
+    guiwindow.logical_scale = Some(window.scale_factor());
+    let guiwindow = guiwindow;
     let window = window_building_utils::set_window_properties(window, &guiwindow);
 
     // State::new uses async code, so we're going to wait for it to finish
@@ -42,15 +44,15 @@ pub fn run(guiwindow: GUIWindow, guiresources: GUIResources) {
                         } => *control_flow = ControlFlow::Exit,
                         WindowEvent::Resized(physical_size) => {
                             state.resize(GUISize {
-                                width: physical_size.width as f64,
-                                height: physical_size.height as f64,
+                                width: GUILength::from_physical_pixels(physical_size.width as f64),
+                                height: GUILength::from_physical_pixels(physical_size.height as f64),
                             });
                         }
                         WindowEvent::ScaleFactorChanged { new_inner_size, .. } => {
                             // new_inner_size is &&mut so w have to dereference it twice
                             state.resize(GUISize {
-                                width: new_inner_size.width as f64,
-                                height: new_inner_size.height as f64,
+                                width: GUILength::from_physical_pixels(new_inner_size.width as f64),
+                                height: GUILength::from_physical_pixels(new_inner_size.height as f64),
                             });
                         }
                         _ => {}

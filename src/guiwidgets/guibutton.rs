@@ -30,10 +30,10 @@ impl Default for GUIButton {
         GUIButton {
             text: "Button",
             size: GUISize {
-                width: 20.,
-                height: 10.,
+                width: GUILength::from_logical_pixels(20.),
+                height: GUILength::from_logical_pixels(10.),
             },
-            radius: GUILength { length: 3. },
+            radius: GUILength::from_logical_pixels(3.),
             background_color: GUIColor {
                 r: 0.7,
                 g: 0.1,
@@ -110,26 +110,26 @@ impl Parent for GUIButton {
 impl Child for GUIButton {}
 
 impl AreaChild for GUIButton {
-    fn get_vertices_and_indices(&self) -> (Vec<Vertex>, Vec<u16>) {
+    fn get_vertices_and_indices(&self, scale: f64) -> (Vec<Vertex>, Vec<u16>) {
         const RADIUS_FASCETS: usize = 10;
-        let top_left_radius = arcs::make_top_left_arc(self.radius.length, RADIUS_FASCETS);
+        let top_left_radius = arcs::make_top_left_arc(self.radius, RADIUS_FASCETS);
         let mut top_left_radius =
-            widget_utils::transpose(top_left_radius, &self.radius, &self.radius.negative());
+            widget_utils::translate(top_left_radius, &self.radius, &self.radius.negative());
 
-        let top_right_radius = arcs::make_top_right_arc(self.radius.length, RADIUS_FASCETS);
-        let top_right_radius = widget_utils::transpose(
+        let top_right_radius = arcs::make_top_right_arc(self.radius, RADIUS_FASCETS);
+        let top_right_radius = widget_utils::translate(
             top_right_radius,
-            &GUILength::zero(),
+            &GUILength::default(),
             &self.radius.negative(),
         );
 
-        let bottom_left_radius = arcs::make_bottom_left_arc(self.radius.length, RADIUS_FASCETS);
+        let bottom_left_radius = arcs::make_bottom_left_arc(self.radius, RADIUS_FASCETS);
         let bottom_left_radius =
-            widget_utils::transpose(bottom_left_radius, &self.radius, &GUILength::zero());
+            widget_utils::translate(bottom_left_radius, &self.radius, &GUILength::default());
 
-        let bottom_right_radius = arcs::make_bottom_right_arc(self.radius.length, RADIUS_FASCETS);
+        let bottom_right_radius = arcs::make_bottom_right_arc(self.radius, RADIUS_FASCETS);
         let bottom_right_radius =
-            widget_utils::transpose(bottom_right_radius, &self.radius, &GUILength::zero());
+            widget_utils::translate(bottom_right_radius, &self.radius, &GUILength::default());
 
         top_left_radius.extend(top_right_radius);
         top_left_radius.extend(bottom_right_radius);
@@ -138,7 +138,7 @@ impl AreaChild for GUIButton {
         let mut vertices = Vec::with_capacity(top_left_radius.len());
         for position in top_left_radius.iter() {
             vertices.push(Vertex {
-                position: [position.x as f32, position.y as f32, 0.],
+                position: [position.x.get_physical_length(scale) as f32, position.y.get_physical_length(scale) as f32, 0.],
                 color: [
                     self.background_color.r as f32,
                     self.background_color.g as f32,

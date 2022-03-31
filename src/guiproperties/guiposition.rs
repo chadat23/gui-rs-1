@@ -1,123 +1,120 @@
-pub use guilengths::{GUIHeight, GUILength, GUIWidth};
+pub use guilengths::GUILength;
 pub use guiposition::GUIPosition;
 pub use guisize::GUISize;
 
 /// A module of structs and tools for representing linear lengths.
 pub mod guilengths {
-    /// Represents heights.
-    pub struct GUIHeight {
-        length: f64,
-    }
 
-    impl GetLength for GUIHeight {
-        /// Returns the stored height.
-        fn get_length(&self) -> u32 {
-            self.length.round() as u32
-        }
-    }
-
-    /// Represents widths.
-    pub struct GUIWidth {
-        length: f64,
-    }
-
-    impl GetLength for GUIWidth {
-        /// Returns the stored width
-        fn get_length(&self) -> u32 {
-            self.length.round() as u32
-        }
+    #[derive(Clone, Copy, Debug, PartialEq)]
+    pub enum LengthType {
+        Generic,
+        PhysicalSize,
+        LogicalSize,
     }
 
     /// Represents a linear dimension (height or width).
-    #[derive(Clone, Copy)]
+    #[derive(Clone, Copy, Debug)]
     pub struct GUILength {
         pub length: f64,
+        pub length_type: LengthType,
     }
 
-    impl GetLength for GUILength {
-        /// Returns the stored length
-        fn get_length(&self) -> u32 {
-            self.length.round() as u32
+    impl Default for GUILength {
+        fn default() -> Self {
+            GUILength { length: 0., length_type: LengthType::LogicalSize }
         }
     }
 
-    impl SetLength for GUILength {
-        /// Sets the length of the GUILength in logical pixels.
-        fn from_pixels(pixels: f64) -> Self {
-            GUILength { length: pixels }
+    impl PartialEq for GUILength {
+        fn eq(&self, other: &GUILength) -> bool {
+            let decimal_places = 8f64;
+            let multiplyer = (10f64).powf(decimal_places);
+
+            (self.length * multiplyer) as u64 == (other.length * multiplyer) as u64 && self.length_type == other.length_type
         }
     }
 
     impl GUILength {
-        pub fn zero() -> Self {
-            GUILength { length: 0. }
-        }
-
         pub fn negative(&self) -> Self {
             GUILength {
                 length: -self.length,
+                length_type: self.length_type,
             }
         }
-    }
 
-    pub trait GetLength {
-        /// Returns the length of the property
-        fn get_length(&self) -> u32;
-    }
+        pub fn get_logical_length(&self, scale: f64) -> f32 {
+            let length = match self.length_type {
+                LengthType::Generic => self.length,
+                LengthType::LogicalSize => self.length,
+                LengthType::PhysicalSize => self.length * scale,
+            };
 
-    pub trait SetLength {
-        /// Sets the length of the property in logical pixels.
-        fn from_pixels(pixels: f64) -> Self;
+            length.round() as f32
+        }
+
+        pub fn get_physical_length(&self, scale: f64) -> f32 {
+            let length = match self.length_type {
+                LengthType::Generic => self.length,
+                LengthType::LogicalSize => self.length / scale,
+                LengthType::PhysicalSize => self.length,
+            };
+
+            length.round() as f32
+        }
+
+        pub fn from_logical_pixels(pixels: f64) -> Self {
+            GUILength {
+                length: pixels,
+                length_type: LengthType::LogicalSize
+            }
+        }
+
+        pub fn from_physical_pixels(pixels: f64) -> Self {
+            GUILength {
+                length: pixels,
+                length_type: LengthType::PhysicalSize
+            }
+        }
     }
 }
 
 /// A module of structs and tools for representing areas, width and height.
 mod guisize {
-    use super::guilengths::{GUILength, GetLength};
+use super::guilengths::{GUILength, LengthType};
 
     /// Represents an area (width and height)
     #[derive(Copy, Clone, Debug)]
     pub struct GUISize {
-        pub width: f64,
-        pub height: f64,
+        pub width: GUILength,
+        pub height: GUILength,
     }
 
     impl Default for GUISize {
-        /// Creates a GUISize with default values.
-        /// Width: 500,
-        /// Height: 500
         fn default() -> GUISize {
-            GUISize {
-                width: 500.,
-                height: 500.,
-            }
+            GUISize::from_logical_pixels(500., 500.)
         }
     }
 
     impl GUISize {
-        /// Creates a size from the input size in units of pixels.
-        pub fn from_pixels(width: u32, height: u32) -> Self {
-            GUISize {
-                width: width as f64,
-                height: height as f64,
-            }
-        }
-
-        /// Creates a size from the input size from two lengths,
-        /// width and height.
         pub fn from_lengths(width: GUILength, height: GUILength) -> Self {
             GUISize {
-                width: width.length,
-                height: height.length,
+                width,
+                height,
             }
         }
 
-        pub fn get_width_in_pixels(&self) -> u32 {
-            self.width.round() as u32
+        pub fn from_logical_pixels(width: f64, height: f64) -> Self {
+            GUISize {
+                width: GUILength::from_logical_pixels(width),
+                height: GUILength::from_logical_pixels(height),
+            }
         }
 
-        pub fn get_height_in_pixels(&self) -> u32 {
-            self.height.round() as u32
+        pub fn from_physical_pixels(width: f64, height: f64) -> Self {
+            GUISize {
+                width: GUILength::from_physical_pixels(width),
+                height: GUILength::from_physical_pixels(height),
+            }
         }
     }
 }
@@ -127,29 +124,39 @@ mod guiposition {
 
     #[derive(Clone, Copy, Debug)]
     pub struct GUIPosition {
-        pub x: f64,
-        pub y: f64,
+        pub x: GUILength,
+        pub y: GUILength,
     }
 
     impl PartialEq for GUIPosition {
         fn eq(&self, other: &GUIPosition) -> bool {
-            let decimal_places = 9;
-            let multiplyer = (10u32.pow(decimal_places)) as f64;
-
-            (self.x * multiplyer).round() == (other.x * multiplyer).round()
-                && (self.y * multiplyer).round() == (other.y * multiplyer).round()
+            self.x == other.x && self.y == other.y
         }
     }
 
     impl GUIPosition {
-        pub fn new(x: f64, y: f64) -> Self {
+        pub fn new(x: GUILength, y: GUILength) -> Self {
             GUIPosition { x, y }
         }
 
         pub fn from_lengths(x: GUILength, y: GUILength) -> Self {
             GUIPosition {
-                x: x.length,
-                y: y.length,
+                x,
+                y,
+            }
+        }
+
+        pub fn from_logical_pixels(x: f64, y: f64) -> Self {
+            GUIPosition {
+                x: GUILength::from_logical_pixels(x),
+                y: GUILength::from_logical_pixels(y),
+            }
+        }
+
+        pub fn from_physical_pixels(x: f64, y: f64) -> Self {
+            GUIPosition {
+                x: GUILength::from_physical_pixels(x),
+                y: GUILength::from_physical_pixels(y),
             }
         }
     }

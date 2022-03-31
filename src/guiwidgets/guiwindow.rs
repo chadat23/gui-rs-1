@@ -1,9 +1,10 @@
+use  winit::window::Window;
+
 use crate::guiproperties::guiposition::{GUIPosition, GUISize};
-use crate::guiproperties::guitraits::{
-    AreaChild, AreaFamily, AreaWidget, Parent, PointChild, Widget, Wind,
-};
+use crate::guiproperties::guitraits::{AreaFamily, AreaWidget, Parent, PointChild, Widget, Wind};
 use crate::guiproperties::GUIColor;
 use crate::guiproperties::GUIIcon;
+use crate::guiproperties::guiposition::GUILength;
 
 /// Represents a gui window.
 /// Given the number of properties that a window has,
@@ -34,6 +35,8 @@ pub struct GUIWindow {
     pub area_children: Option<Vec<Box<dyn AreaFamily>>>,
     /// A list of child widgets that don't have an area
     pub point_children: Option<Vec<Box<dyn PointChild>>>,
+    /// The scale that converts between the devices logical and physical pixels.
+    pub logical_scale: Option<f64>,
 }
 
 impl Default for GUIWindow {
@@ -42,16 +45,16 @@ impl Default for GUIWindow {
         GUIWindow {
             title: "Form1",
             size: GUISize {
-                width: 500.,
-                height: 500.,
+                width: GUILength::from_logical_pixels(500.),
+                height: GUILength::from_logical_pixels(500.),
             },
             min_size: GUISize {
-                width: 100.,
-                height: 100.,
+                width: GUILength::from_logical_pixels(100.),
+                height: GUILength::from_logical_pixels(100.),
             },
             max_size: GUISize {
-                width: 800.,
-                height: 800.,
+                width: GUILength::from_logical_pixels(800.),
+                height: GUILength::from_logical_pixels(800.),
             },
             resizable: true,
             always_on_top: false,
@@ -65,6 +68,7 @@ impl Default for GUIWindow {
             },
             area_children: None,
             point_children: None,
+            logical_scale: None,
         }
     }
 }

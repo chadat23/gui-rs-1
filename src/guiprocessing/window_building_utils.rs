@@ -7,33 +7,34 @@ use crate::guiwidgets::GUIWindow;
 
 pub fn set_window_properties(window: Window, guiwindow: &GUIWindow) -> Window {
     window.set_title(guiwindow.title);
+    // window.set_inner_size(PhysicalSize::new(width: 8, height: 8));
     window.set_inner_size(PhysicalSize::new(
-        guiwindow.size.width,
-        guiwindow.size.height,
+        guiwindow.size.width.get_physical_length(guiwindow.logical_scale.unwrap()) as u32,
+        guiwindow.size.height.get_physical_length(guiwindow.logical_scale.unwrap()) as u32,
     ));
     window.set_min_inner_size(Some(PhysicalSize::new(
-        guiwindow.min_size.width,
-        guiwindow.min_size.height,
+        guiwindow.min_size.width.get_physical_length(guiwindow.logical_scale.unwrap()) as u32,
+        guiwindow.min_size.height.get_physical_length(guiwindow.logical_scale.unwrap()) as u32,
     )));
     window.set_max_inner_size(Some(PhysicalSize::new(
-        guiwindow.max_size.width,
-        guiwindow.max_size.height,
+        guiwindow.max_size.width.get_physical_length(guiwindow.logical_scale.unwrap()) as u32,
+        guiwindow.max_size.height.get_physical_length(guiwindow.logical_scale.unwrap()) as u32,
     )));
     window
 }
 
-pub fn we_will_see(children: &Option<Vec<Box<dyn AreaFamily>>>) -> (Vec<Vertex>, Vec<u16>) {
+pub fn we_will_see(children: &Option<Vec<Box<dyn AreaFamily>>>, scale: f64) -> (Vec<Vertex>, Vec<u16>) {
     let mut all_vertices: Vec<Vertex> = Vec::new();
     let mut all_indices: Vec<u16> = Vec::new();
     match children {
         Some(children) => {
             for child in children.iter() {
                 let child = child;
-                let (vertices, indices) = child.get_vertices_and_indices();
+                let (vertices, indices) = child.get_vertices_and_indices(scale);
                 all_vertices.extend(vertices);
                 all_indices.extend(indices);
                 if child.children_len() > 0 {
-                    let (vertices, indices) = child.get_vertices_and_indices();
+                    let (vertices, indices) = child.get_vertices_and_indices(scale);
                     all_vertices.extend(vertices);
                     all_indices.extend(indices);
                 }

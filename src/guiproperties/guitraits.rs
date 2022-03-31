@@ -46,9 +46,9 @@ pub trait Child: Widget {
 }
 
 pub trait AreaChild: Child {
-    fn get_vertices_and_indices(&self) -> (Vec<Vertex>, Vec<u16>);
+    fn get_vertices_and_indices(&self, scale: f64) -> (Vec<Vertex>, Vec<u16>);
 }
 
 pub trait AreaFamily: AreaChild + Parent + AreaWidget {}
 
-pub trait PointChild: Child {}
+pub trait PointChild: Child {} 
