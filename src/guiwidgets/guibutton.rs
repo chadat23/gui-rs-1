@@ -1,27 +1,24 @@
 use crate::guiprocessing::vertices::Vertex;
-use crate::guiproperties::guiposition::{GUILength, GUISize};
-use crate::guiproperties::guitraits::{
-    AreaChild, AreaFamily, AreaWidget, Child, Parent, PointChild, Widget,
-};
-use crate::guiproperties::{GUIColor, GUIPolygon};
+use crate::guiproperties::guiposition::{GUILength, GUISize, GUIPosition};
+use crate::guiproperties::guitraits::{Family, Child, Parent, Widget};
+use crate::guiproperties::GUIColor;
 use crate::guiwidgets::{widget_utils, widget_utils::arcs};
 
 /// Represents a gui button.
 // #[derive(Clone, Copy)]
 pub struct GUIButton {
-    // /// The tile of the button.
+    /// The tile of the button.
     pub text: &'static str,
     /// The size of the button.
     pub size: GUISize,
+    /// The location of the button.
+    pub position: GUIPosition,
     /// Radius of the button corners.
     pub radius: GUILength,
     /// The background color for the button.
     pub background_color: GUIColor,
-    // pub polygon: Option<GUIPolygon>,
     /// A list of child widgets
-    pub area_children: Option<Vec<Box<dyn AreaFamily>>>,
-    /// A list of child widgets
-    pub point_children: Option<Vec<Box<dyn PointChild>>>,
+    pub children: Option<Vec<Box<dyn Family>>>,
 }
 
 impl Default for GUIButton {
@@ -33,6 +30,7 @@ impl Default for GUIButton {
                 width: GUILength::from_logical_pixels(20.),
                 height: GUILength::from_logical_pixels(10.),
             },
+            position: GUIPosition::from_logical_pixels(10., 15.),
             radius: GUILength::from_logical_pixels(3.),
             background_color: GUIColor {
                 r: 0.7,
@@ -40,9 +38,7 @@ impl Default for GUIButton {
                 b: 0.4,
                 a: 1.0,
             },
-            // polygon: None,
-            point_children: None,
-            area_children: None,
+            children: None,
         }
     }
 }
@@ -51,9 +47,7 @@ impl Widget for GUIButton {
     fn is_rendered(&self) -> bool {
         true
     }
-}
 
-impl AreaWidget for GUIButton {
     /// Set the size (width and height) of the window in units of logical pixels.
     fn set_size(&mut self, size: GUISize) {
         self.size = size;
@@ -71,45 +65,32 @@ impl Parent for GUIButton {
     /// in which they're added so children that should be
     /// visually obscured by other children should be added
     /// before the obscuring children.
-    fn add_area_child(&mut self, child: Box<dyn AreaFamily>) {
-        match &mut self.area_children {
+    fn add_child(&mut self, child: Box<dyn Family>) {
+        match &mut self.children {
             Some(children) => {
                 children.push(child);
             }
             _ => {
-                self.area_children = Some(Vec::from([child]));
-            }
-        };
-    }
-
-    fn add_point_child(&mut self, child: Box<dyn PointChild>) {
-        match &mut self.point_children {
-            Some(children) => {
-                children.push(child);
-            }
-            _ => {
-                self.point_children = Some(Vec::from([child]));
+                self.children = Some(Vec::from([child]));
             }
         };
     }
 
     /// Returns the number of children.
     fn children_len(&self) -> usize {
-        match &self.area_children {
+        match &self.children {
             Some(children) => children.len(),
             None => 0,
         }
     }
 
     /// Gets the children.
-    fn get_area_children(&self) -> &Option<Vec<Box<dyn AreaFamily>>> {
-        &self.area_children
+    fn get_area_children(&self) -> &Option<Vec<Box<dyn Family>>> {
+        &self.children
     }
 }
 
-impl Child for GUIButton {}
-
-impl AreaChild for GUIButton {
+impl Child for GUIButton {
     fn get_vertices_and_indices(&self, scale: f64) -> (Vec<Vertex>, Vec<u16>) {
         const RADIUS_FASCETS: usize = 10;
         let top_left_radius = arcs::make_top_left_arc(self.radius, RADIUS_FASCETS);
@@ -162,4 +143,4 @@ impl AreaChild for GUIButton {
     }
 }
 
-impl AreaFamily for GUIButton {}
+impl Family for GUIButton {}

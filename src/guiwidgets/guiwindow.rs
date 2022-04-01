@@ -2,7 +2,7 @@ use winit::window::Window;
 
 use crate::guiproperties::guiposition::GUILength;
 use crate::guiproperties::guiposition::{GUIPosition, GUISize};
-use crate::guiproperties::guitraits::{AreaFamily, AreaWidget, Parent, PointChild, Widget, Wind};
+use crate::guiproperties::guitraits::{Family, Widget, Parent, Wind};
 use crate::guiproperties::GUIColor;
 use crate::guiproperties::GUIIcon;
 
@@ -31,10 +31,8 @@ pub struct GUIWindow {
     pub ime_position: Option<GUIPosition>,
     /// The background color for the window.
     pub background_color: GUIColor,
-    /// A list of child widgets that have an area
-    pub area_children: Option<Vec<Box<dyn AreaFamily>>>,
-    /// A list of child widgets that don't have an area
-    pub point_children: Option<Vec<Box<dyn PointChild>>>,
+    /// A list of child widgets.
+    pub children: Option<Vec<Box<dyn Family>>>,
     /// The scale that converts between the devices logical and physical pixels.
     pub logical_scale: Option<f64>,
 }
@@ -66,8 +64,7 @@ impl Default for GUIWindow {
                 b: 0.4,
                 a: 1.0,
             },
-            area_children: None,
-            point_children: None,
+            children: None,
             logical_scale: None,
         }
     }
@@ -77,9 +74,7 @@ impl Widget for GUIWindow {
     fn is_rendered(&self) -> bool {
         true
     }
-}
 
-impl AreaWidget for GUIWindow {
     /// Set the size (width and height) of the window in units of logical pixels.
     fn set_size(&mut self, size: GUISize) {
         self.size = size;
@@ -124,38 +119,27 @@ impl Parent for GUIWindow {
     /// in which they're added so children that should be
     /// visually obscured by other children should be added
     /// before the obscuring children.
-    fn add_area_child(&mut self, child: Box<dyn AreaFamily>) {
-        match &mut self.area_children {
+    fn add_child(&mut self, child: Box<dyn Family>) {
+        match &mut self.children {
             Some(children) => {
                 children.push(child);
             }
             _ => {
-                self.area_children = Some(Vec::from([child]));
-            }
-        };
-    }
-
-    fn add_point_child(&mut self, child: Box<dyn PointChild>) {
-        match &mut self.point_children {
-            Some(children) => {
-                children.push(child);
-            }
-            _ => {
-                self.point_children = Some(Vec::from([child]));
+                self.children = Some(Vec::from([child]));
             }
         };
     }
 
     /// Returns the number of children.
     fn children_len(&self) -> usize {
-        match &self.area_children {
+        match &self.children {
             Some(children) => children.len(),
             None => 0,
         }
     }
 
     /// Gets the children.
-    fn get_area_children(&self) -> &Option<Vec<Box<dyn AreaFamily>>> {
-        &self.area_children
+    fn get_area_children(&self) -> &Option<Vec<Box<dyn Family>>> {
+        &self.children
     }
 }

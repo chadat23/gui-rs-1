@@ -128,7 +128,7 @@ impl State {
         });
 
         let (vertices, indices) = window_building_utils::make_vertices_and_indices(
-            &guiwindow.area_children,
+            &guiwindow.children,
             guiwindow.logical_scale.unwrap(),
         );
 

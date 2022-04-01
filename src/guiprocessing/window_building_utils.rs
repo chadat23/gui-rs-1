@@ -42,7 +42,7 @@ pub fn set_window_properties(window: Window, guiwindow: &GUIWindow) -> Window {
 }
 
 pub fn make_vertices_and_indices(
-    children: &Option<Vec<Box<dyn AreaFamily>>>,
+    children: &Option<Vec<Box<dyn Family>>>,
     scale: f64,
 ) -> (Vec<Vertex>, Vec<u16>) {
     let mut all_vertices: Vec<Vertex> = Vec::new();
