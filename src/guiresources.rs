@@ -76,13 +76,14 @@ impl GUIResources {
     /// Returns the wgpu Backend that corrisponds to the
     /// previously selected GUIBackend
     pub fn backend(&self) -> Backends {
+        use GUIBackend::*;
         match self.backend {
-            GUIBackend::Vulkan => Backends::VULKAN,
-            GUIBackend::Metal => Backends::METAL,
-            GUIBackend::Dx12 => Backends::DX12,
-            GUIBackend::Dx11 => Backends::DX11,
-            GUIBackend::Gl => Backends::GL,
-            GUIBackend::BrowserWebGpu => Backends::BROWSER_WEBGPU,
+            Vulkan => Backends::VULKAN,
+            Metal => Backends::METAL,
+            Dx12 => Backends::DX12,
+            Dx11 => Backends::DX11,
+            Gl => Backends::GL,
+            BrowserWebGpu => Backends::BROWSER_WEBGPU,
         }
     }
 }
