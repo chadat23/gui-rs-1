@@ -1,5 +1,3 @@
-use winit::window::Window;
-
 use crate::guiproperties::guiposition::GUILength;
 use crate::guiproperties::guiposition::{GUIPosition, GUISize};
 use crate::guiproperties::guitraits::{Family, Parent, Widget, Wind};
@@ -43,16 +41,16 @@ impl Default for GUIWindow {
         GUIWindow {
             title: "Form1",
             size: GUISize {
-                width: GUILength::from_logical_pixels(500.),
-                height: GUILength::from_logical_pixels(500.),
+                width: GUILength::from_pixels(500.),
+                height: GUILength::from_pixels(500.),
             },
             min_size: GUISize {
-                width: GUILength::from_logical_pixels(100.),
-                height: GUILength::from_logical_pixels(100.),
+                width: GUILength::from_pixels(100.),
+                height: GUILength::from_pixels(100.),
             },
             max_size: GUISize {
-                width: GUILength::from_logical_pixels(800.),
-                height: GUILength::from_logical_pixels(800.),
+                width: GUILength::from_pixels(800.),
+                height: GUILength::from_pixels(800.),
             },
             resizable: true,
             always_on_top: false,

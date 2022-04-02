@@ -127,12 +127,14 @@ impl State {
             multiview: None,
         });
 
-        let (vertices, indices) = window_building_utils::make_vertices_and_indices(
+        let (mut vertices, mut indices) = window_building_utils::make_vertices_and_indices(
             &guiwindow.size,
             &guiwindow.children,
             &guiwindow.logical_scale.unwrap(),
         );
-
+        // let (vertices, indices) = (&vertices[32..64], &indices[90..180]);
+        // vertices.reverse();
+        // indices.reverse();
         let vertex_buffer = device.create_buffer_init(&wgpu::util::BufferInitDescriptor {
             label: Some("Vertex Buffer"),
             // contents: bytemuck::cast_slice(VERTICES),

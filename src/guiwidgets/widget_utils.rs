@@ -20,11 +20,9 @@ pub mod arcs {
             positions.push(GUIPosition {
                 x: GUILength {
                     length: radius.length * angle.cos(),
-                    length_type: radius.length_type,
                 },
                 y: GUILength {
                     length: -radius.length * angle.sin(),
-                    length_type: radius.length_type,
                 },
             });
         }
@@ -45,7 +43,6 @@ pub mod arcs {
             .map(|position| GUIPosition {
                 x: GUILength {
                     length: position.x.length * -1.,
-                    length_type: position.x.length_type,
                 },
                 y: position.y,
             })
@@ -66,7 +63,6 @@ pub mod arcs {
                 x: position.x,
                 y: GUILength {
                     length: position.y.length * -1.,
-                    length_type: position.y.length_type,
                 },
             })
             .collect()
@@ -84,11 +80,9 @@ pub mod arcs {
             .map(|position| GUIPosition {
                 x: GUILength {
                     length: position.x.length * -1.,
-                    length_type: position.x.length_type,
                 },
                 y: GUILength {
                     length: position.y.length * -1.,
-                    length_type: position.y.length_type,
                 },
             })
             .collect()
@@ -116,52 +110,52 @@ mod tests {
 
     #[test]
     fn make_top_right_arc_good() {
-        let actual = make_top_right_arc(GUILength::from_logical_pixels(5.), 4);
+        let actual = make_top_right_arc(GUILength::from_pixels(5.), 4);
         let expected = Vec::from([
-            GUIPosition::from_logical_pixels(5., 0.),
-            GUIPosition::from_logical_pixels(4.6193976625564339, -1.913417161825449),
-            GUIPosition::from_logical_pixels(3.5355339059327378, -3.5355339059327373),
-            GUIPosition::from_logical_pixels(1.9134171618254492, -4.6193976625564339),
-            GUIPosition::from_logical_pixels(0., -5.),
+            GUIPosition::from_pixels(5., 0.),
+            GUIPosition::from_pixels(4.6193976625564339, -1.913417161825449),
+            GUIPosition::from_pixels(3.5355339059327378, -3.5355339059327373),
+            GUIPosition::from_pixels(1.9134171618254492, -4.6193976625564339),
+            GUIPosition::from_pixels(0., -5.),
         ]);
         assert_eq!(actual, expected);
     }
 
     #[test]
     fn make_top_left_arc_good() {
-        let actual = make_top_left_arc(GUILength::from_logical_pixels(5.), 4);
+        let actual = make_top_left_arc(GUILength::from_pixels(5.), 4);
         let expected = Vec::from([
-            GUIPosition::from_logical_pixels(0., -5.),
-            GUIPosition::from_logical_pixels(-1.9134171618254492, -4.6193976625564339),
-            GUIPosition::from_logical_pixels(-3.5355339059327378, -3.5355339059327373),
-            GUIPosition::from_logical_pixels(-4.6193976625564339, -1.913417161825449),
-            GUIPosition::from_logical_pixels(-5., 0.),
+            GUIPosition::from_pixels(0., -5.),
+            GUIPosition::from_pixels(-1.9134171618254492, -4.6193976625564339),
+            GUIPosition::from_pixels(-3.5355339059327378, -3.5355339059327373),
+            GUIPosition::from_pixels(-4.6193976625564339, -1.913417161825449),
+            GUIPosition::from_pixels(-5., 0.),
         ]);
         assert_eq!(actual, expected);
     }
 
     #[test]
     fn make_bottom_right_arc_good() {
-        let actual = make_bottom_right_arc(GUILength::from_logical_pixels(5.), 4);
+        let actual = make_bottom_right_arc(GUILength::from_pixels(5.), 4);
         let expected = Vec::from([
-            GUIPosition::from_logical_pixels(0., 5.),
-            GUIPosition::from_logical_pixels(1.9134171618254492, 4.6193976625564339),
-            GUIPosition::from_logical_pixels(3.5355339059327378, 3.5355339059327373),
-            GUIPosition::from_logical_pixels(4.6193976625564339, 1.913417161825449),
-            GUIPosition::from_logical_pixels(5., 0.),
+            GUIPosition::from_pixels(0., 5.),
+            GUIPosition::from_pixels(1.9134171618254492, 4.6193976625564339),
+            GUIPosition::from_pixels(3.5355339059327378, 3.5355339059327373),
+            GUIPosition::from_pixels(4.6193976625564339, 1.913417161825449),
+            GUIPosition::from_pixels(5., 0.),
         ]);
         assert_eq!(actual, expected);
     }
 
     #[test]
     fn make_bottom_left_arc_good() {
-        let actual = make_bottom_left_arc(GUILength::from_logical_pixels(5.), 4);
+        let actual = make_bottom_left_arc(GUILength::from_pixels(5.), 4);
         let expected = Vec::from([
-            GUIPosition::from_logical_pixels(-5., 0.),
-            GUIPosition::from_logical_pixels(-4.6193976625564339, 1.913417161825449),
-            GUIPosition::from_logical_pixels(-3.5355339059327378, 3.5355339059327373),
-            GUIPosition::from_logical_pixels(-1.9134171618254492, 4.6193976625564339),
-            GUIPosition::from_logical_pixels(0., 5.),
+            GUIPosition::from_pixels(-5., 0.),
+            GUIPosition::from_pixels(-4.6193976625564339, 1.913417161825449),
+            GUIPosition::from_pixels(-3.5355339059327378, 3.5355339059327373),
+            GUIPosition::from_pixels(-1.9134171618254492, 4.6193976625564339),
+            GUIPosition::from_pixels(0., 5.),
         ]);
         assert_eq!(actual, expected);
     }

@@ -27,11 +27,11 @@ impl Default for GUIButton {
         GUIButton {
             text: "Button",
             size: GUISize {
-                width: GUILength::from_logical_pixels(200.),
-                height: GUILength::from_logical_pixels(200.),
+                width: GUILength::from_pixels(200.),
+                height: GUILength::from_pixels(200.),
             },
-            position: GUIPosition::from_logical_pixels(50., 100.),
-            radius: GUILength::from_logical_pixels(50.),
+            position: GUIPosition::from_pixels(300., 100.),
+            radius: GUILength::from_pixels(50.),
             background_color: GUIColor {
                 r: 0.7,
                 g: 0.1,
@@ -96,7 +96,7 @@ impl Child for GUIButton {
         parent_size: &GUISize,
         scale: &f64,
     ) -> (Vec<Vertex>, Vec<u16>) {
-        const FASCET_COUNT: usize = 10;
+        const FASCET_COUNT: usize = 7;
         let mut top_left_radius = arcs::make_top_left_arc(self.radius, FASCET_COUNT);
         top_left_radius = widget_utils::translate(
             top_left_radius,
@@ -141,12 +141,8 @@ impl Child for GUIButton {
         for position in top_left_radius.iter() {
             vertices.push(Vertex {
                 position: [
-                    position.x.get_logical_length(scale)
-                        / parent_size.width.get_logical_length(scale)
-                        - 1.,
-                    -position.y.get_logical_length(scale)
-                        / parent_size.height.get_logical_length(scale)
-                        + 1.,
+                    (position.x.get_length() / parent_size.width.get_length() - 1.) as f32,
+                    (-position.y.get_length() / parent_size.height.get_length() + 1.) as f32,
                     0.,
                 ],
                 color: [
@@ -162,6 +158,9 @@ impl Child for GUIButton {
             indices.push(0);
             indices.push((i + 1) as u16);
             indices.push((i + 2) as u16);
+            // indices.push((i + 2) as u16);
+            // indices.push((i + 1) as u16);
+            // indices.push(0);
         }
 
         (vertices, indices)

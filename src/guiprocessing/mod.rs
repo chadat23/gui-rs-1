@@ -48,6 +48,7 @@ pub fn run(mut guiwindow: GUIWindow, guiresources: GUIResources) {
                             state.resize(GUISize::from_physical_pixels(
                                 physical_size.width as f64,
                                 physical_size.height as f64,
+                                &state.guiwindow.logical_scale.unwrap(),
                             ));
                         }
                         WindowEvent::ScaleFactorChanged { new_inner_size, .. } => {
@@ -55,6 +56,7 @@ pub fn run(mut guiwindow: GUIWindow, guiresources: GUIResources) {
                             state.resize(GUISize::from_physical_pixels(
                                 new_inner_size.width as f64,
                                 new_inner_size.height as f64,
+                                &state.guiwindow.logical_scale.unwrap(),
                             ));
                         }
                         _ => {}
