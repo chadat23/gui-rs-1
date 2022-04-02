@@ -8,8 +8,8 @@ pub mod guilengths {
     #[derive(Clone, Copy, Debug, PartialEq)]
     pub enum LengthType {
         Generic,
-        PhysicalSize,
-        LogicalSize,
+        PhysicalLength,
+        LogicalLength,
     }
 
     /// Represents a linear dimension (height or width).
@@ -23,7 +23,7 @@ pub mod guilengths {
         fn default() -> Self {
             GUILength {
                 length: 0.,
-                length_type: LengthType::LogicalSize,
+                length_type: LengthType::LogicalLength,
             }
         }
     }
@@ -46,21 +46,23 @@ pub mod guilengths {
             }
         }
 
-        pub fn get_logical_length(&self, scale: f64) -> f32 {
+        pub fn get_logical_length(&self, scale: &f64) -> f32 {
             let length = match self.length_type {
                 LengthType::Generic => self.length,
-                LengthType::LogicalSize => self.length,
-                LengthType::PhysicalSize => self.length * scale,
+                LengthType::LogicalLength => self.length,
+                LengthType::PhysicalLength => self.length * scale,
             };
+
+            // todo!("Percent clearly needs some work");
 
             length.round() as f32
         }
 
-        pub fn get_physical_length(&self, scale: f64) -> f32 {
+        pub fn get_physical_length(&self, scale: &f64) -> f32 {
             let length = match self.length_type {
                 LengthType::Generic => self.length,
-                LengthType::LogicalSize => self.length / scale,
-                LengthType::PhysicalSize => self.length,
+                LengthType::LogicalLength => self.length / scale,
+                LengthType::PhysicalLength => self.length,
             };
 
             length.round() as f32
@@ -69,14 +71,68 @@ pub mod guilengths {
         pub fn from_logical_pixels(pixels: f64) -> Self {
             GUILength {
                 length: pixels,
-                length_type: LengthType::LogicalSize,
+                length_type: LengthType::LogicalLength,
             }
         }
 
         pub fn from_physical_pixels(pixels: f64) -> Self {
             GUILength {
                 length: pixels,
-                length_type: LengthType::PhysicalSize,
+                length_type: LengthType::PhysicalLength,
+            }
+        }
+
+        pub fn add(&self, other: &GUILength) -> Self {
+            if (self.length_type == other.length_type) || (self.length == 0. || other.length == 0.)
+            {
+                GUILength {
+                    length: self.length + other.length,
+                    length_type: self.length_type,
+                }
+            } else {
+                panic!("Can only currently add lengths that are of the same type")
+            }
+        }
+
+        pub fn subtract(&self, other: &GUILength) -> Self {
+            if (self.length_type == other.length_type) || (self.length == 0. || other.length == 0.)
+            {
+                GUILength {
+                    length: self.length - other.length,
+                    length_type: self.length_type,
+                }
+            } else {
+                panic!("Can only currently subtract lengths that are of the same type")
+            }
+        }
+
+        pub fn multiply(&self, other: &GUILength) -> Self {
+            if (self.length_type == other.length_type)
+                || (self.length == 0. || other.length == 0.)
+                || (self.length_type == LengthType::Generic
+                    || other.length_type == LengthType::Generic)
+            {
+                GUILength {
+                    length: self.length * other.length,
+                    length_type: self.length_type,
+                }
+            } else {
+                panic!("Can only currently multiply lengths that are of the same type")
+            }
+        }
+
+        pub fn devide_by(&self, other: &GUILength) -> Self {
+            if (self.length_type == other.length_type)
+                || (self.length == 0. || other.length == 0.)
+                || (self.length_type == LengthType::Generic
+                    || other.length_type == LengthType::Generic)
+            {
+                GUILength {
+                    length: self.length / other.length,
+                    length_type: self.length_type,
+                }
+            } else {
+                panic!("Can only currently devide lengths that are of the same type")
             }
         }
     }
@@ -84,7 +140,7 @@ pub mod guilengths {
 
 /// A module of structs and tools for representing areas, width and height.
 mod guisize {
-    use super::guilengths::{GUILength, LengthType};
+    use super::guilengths::GUILength;
 
     /// Represents an area (width and height)
     #[derive(Copy, Clone, Debug)]

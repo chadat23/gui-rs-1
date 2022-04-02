@@ -2,7 +2,7 @@ use winit::window::Window;
 
 use crate::guiproperties::guiposition::GUILength;
 use crate::guiproperties::guiposition::{GUIPosition, GUISize};
-use crate::guiproperties::guitraits::{Family, Widget, Parent, Wind};
+use crate::guiproperties::guitraits::{Family, Parent, Widget, Wind};
 use crate::guiproperties::GUIColor;
 use crate::guiproperties::GUIIcon;
 

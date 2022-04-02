@@ -1,6 +1,6 @@
 use crate::guiprocessing::vertices::Vertex;
-use crate::guiproperties::guiposition::{GUILength, GUISize, GUIPosition};
-use crate::guiproperties::guitraits::{Family, Child, Parent, Widget};
+use crate::guiproperties::guiposition::{GUILength, GUIPosition, GUISize};
+use crate::guiproperties::guitraits::{Child, Family, Parent, Widget};
 use crate::guiproperties::GUIColor;
 use crate::guiwidgets::{widget_utils, widget_utils::arcs};
 
@@ -27,11 +27,11 @@ impl Default for GUIButton {
         GUIButton {
             text: "Button",
             size: GUISize {
-                width: GUILength::from_logical_pixels(20.),
-                height: GUILength::from_logical_pixels(10.),
+                width: GUILength::from_logical_pixels(200.),
+                height: GUILength::from_logical_pixels(200.),
             },
-            position: GUIPosition::from_logical_pixels(10., 15.),
-            radius: GUILength::from_logical_pixels(3.),
+            position: GUIPosition::from_logical_pixels(50., 100.),
+            radius: GUILength::from_logical_pixels(50.),
             background_color: GUIColor {
                 r: 0.7,
                 g: 0.1,
@@ -91,37 +91,42 @@ impl Parent for GUIButton {
 }
 
 impl Child for GUIButton {
-    fn get_vertices_and_indices(&self, scale: f64) -> (Vec<Vertex>, Vec<u16>) {
-        const RADIUS_FASCETS: usize = 10;
-        let top_left_radius = arcs::make_top_left_arc(self.radius, RADIUS_FASCETS);
-        let mut top_left_radius =
-            widget_utils::translate(top_left_radius, &self.radius, &self.radius.negative());
+    fn get_vertices_and_indices(&self, window_size: &GUISize, scale: &f64) -> (Vec<Vertex>, Vec<u16>) {
+        const FASCET_COUNT: usize = 10;
+        let mut top_left_radius = arcs::make_top_left_arc(self.radius, FASCET_COUNT);
+        top_left_radius = widget_utils::translate(top_left_radius, &self.radius.add(&self.position.x), &self.radius.add(&self.position.y));
 
-        let top_right_radius = arcs::make_top_right_arc(self.radius, RADIUS_FASCETS);
+        let top_right_radius = arcs::make_top_right_arc(self.radius, FASCET_COUNT);
         let top_right_radius = widget_utils::translate(
             top_right_radius,
-            &GUILength::default(),
-            &self.radius.negative(),
+            &self.size.width.subtract(&self.radius).add(&self.position.x),
+            &self.radius.add(&self.position.y),
         );
 
-        let bottom_left_radius = arcs::make_bottom_left_arc(self.radius, RADIUS_FASCETS);
-        let bottom_left_radius =
-            widget_utils::translate(bottom_left_radius, &self.radius, &GUILength::default());
+        let bottom_left_radius = arcs::make_bottom_left_arc(self.radius, FASCET_COUNT);
+        let bottom_left_radius = widget_utils::translate(
+            bottom_left_radius,
+            &self.radius.add(&self.position.x),
+            &self.size.height.subtract(&self.radius).add(&self.position.y),
+        );
 
-        let bottom_right_radius = arcs::make_bottom_right_arc(self.radius, RADIUS_FASCETS);
-        let bottom_right_radius =
-            widget_utils::translate(bottom_right_radius, &self.radius, &GUILength::default());
+        let bottom_right_radius = arcs::make_bottom_right_arc(self.radius, FASCET_COUNT);
+        let bottom_right_radius = widget_utils::translate(
+            bottom_right_radius,
+            &self.size.width.subtract(&self.radius).add(&self.position.x),
+            &self.size.height.subtract(&self.radius).add(&self.position.y),
+        );
 
-        top_left_radius.extend(top_right_radius);
-        top_left_radius.extend(bottom_right_radius);
         top_left_radius.extend(bottom_left_radius);
+        top_left_radius.extend(bottom_right_radius);
+        top_left_radius.extend(top_right_radius);
 
         let mut vertices = Vec::with_capacity(top_left_radius.len());
         for position in top_left_radius.iter() {
             vertices.push(Vertex {
                 position: [
-                    position.x.get_physical_length(scale) as f32,
-                    position.y.get_physical_length(scale) as f32,
+                    position.x.get_logical_length(scale) / window_size.width.get_logical_length(scale) - 1.,
+                    -position.y.get_logical_length(scale) / window_size.height.get_logical_length(scale) + 1.,
                     0.,
                 ],
                 color: [
@@ -131,7 +136,7 @@ impl Child for GUIButton {
                 ],
             });
         }
-        let number_of_triangles = top_left_radius.len() - 2;
+        let number_of_triangles = vertices.len() - 2;
         let mut indices = Vec::with_capacity(number_of_triangles * 3);
         for i in 0..number_of_triangles {
             indices.push(0);
