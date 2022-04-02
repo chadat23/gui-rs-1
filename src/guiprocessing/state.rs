@@ -165,8 +165,14 @@ impl State {
             width: new_size.width,
             height: new_size.height,
         };
-        self.config.width = new_size.width.get_physical_length(&self.guiwindow.logical_scale.unwrap()).round() as u32;
-        self.config.height = new_size.height.get_physical_length(&self.guiwindow.logical_scale.unwrap()).round() as u32;
+        self.config.width = new_size
+            .width
+            .get_physical_length(&self.guiwindow.logical_scale.unwrap())
+            .round() as u32;
+        self.config.height = new_size
+            .height
+            .get_physical_length(&self.guiwindow.logical_scale.unwrap())
+            .round() as u32;
         self.surface.configure(&self.device, &self.config);
     }
 

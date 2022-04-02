@@ -91,10 +91,18 @@ impl Parent for GUIButton {
 }
 
 impl Child for GUIButton {
-    fn get_vertices_and_indices(&self, parent_size: &GUISize, scale: &f64) -> (Vec<Vertex>, Vec<u16>) {
+    fn get_vertices_and_indices(
+        &self,
+        parent_size: &GUISize,
+        scale: &f64,
+    ) -> (Vec<Vertex>, Vec<u16>) {
         const FASCET_COUNT: usize = 10;
         let mut top_left_radius = arcs::make_top_left_arc(self.radius, FASCET_COUNT);
-        top_left_radius = widget_utils::translate(top_left_radius, &self.radius.add(&self.position.x), &self.radius.add(&self.position.y));
+        top_left_radius = widget_utils::translate(
+            top_left_radius,
+            &self.radius.add(&self.position.x),
+            &self.radius.add(&self.position.y),
+        );
 
         let top_right_radius = arcs::make_top_right_arc(self.radius, FASCET_COUNT);
         let top_right_radius = widget_utils::translate(
@@ -107,14 +115,22 @@ impl Child for GUIButton {
         let bottom_left_radius = widget_utils::translate(
             bottom_left_radius,
             &self.radius.add(&self.position.x),
-            &self.size.height.subtract(&self.radius).add(&self.position.y),
+            &self
+                .size
+                .height
+                .subtract(&self.radius)
+                .add(&self.position.y),
         );
 
         let bottom_right_radius = arcs::make_bottom_right_arc(self.radius, FASCET_COUNT);
         let bottom_right_radius = widget_utils::translate(
             bottom_right_radius,
             &self.size.width.subtract(&self.radius).add(&self.position.x),
-            &self.size.height.subtract(&self.radius).add(&self.position.y),
+            &self
+                .size
+                .height
+                .subtract(&self.radius)
+                .add(&self.position.y),
         );
 
         top_left_radius.extend(bottom_left_radius);
@@ -125,8 +141,12 @@ impl Child for GUIButton {
         for position in top_left_radius.iter() {
             vertices.push(Vertex {
                 position: [
-                    position.x.get_logical_length(scale) / parent_size.width.get_logical_length(scale) - 1.,
-                    -position.y.get_logical_length(scale) / parent_size.height.get_logical_length(scale) + 1.,
+                    position.x.get_logical_length(scale)
+                        / parent_size.width.get_logical_length(scale)
+                        - 1.,
+                    -position.y.get_logical_length(scale)
+                        / parent_size.height.get_logical_length(scale)
+                        + 1.,
                     0.,
                 ],
                 color: [
