@@ -1,3 +1,5 @@
+use ::std::time::SystemTime;
+
 use winit::event::{ElementState, Event, KeyboardInput, VirtualKeyCode, WindowEvent};
 use winit::event_loop::{ControlFlow, EventLoop};
 use winit::window::WindowBuilder;
@@ -63,7 +65,8 @@ pub fn run(mut guiwindow: GUIWindow, guiresources: GUIResources) {
                 // state.update();
                 match state.render() {
                     Ok(_) => {
-                        println!("good!")
+                        // println!("good!");
+                        // println!("{:?}", SystemTime::now());
                     }
                     // Reconfigure the surface if lost
                     Err(wgpu::SurfaceError::Lost) => {

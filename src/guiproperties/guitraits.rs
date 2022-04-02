@@ -39,7 +39,7 @@ pub trait Parent: Widget {
 }
 
 pub trait Child: Widget {
-    fn get_vertices_and_indices(&self, size: &GUISize, scale: &f64) -> (Vec<Vertex>, Vec<u16>);
+    fn get_vertices_and_indices(&self, parent_size: &GUISize, scale: &f64) -> (Vec<Vertex>, Vec<u16>);
 }
 
 pub trait Family: Child + Parent {}

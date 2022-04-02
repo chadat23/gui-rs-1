@@ -91,7 +91,7 @@ impl Parent for GUIButton {
 }
 
 impl Child for GUIButton {
-    fn get_vertices_and_indices(&self, window_size: &GUISize, scale: &f64) -> (Vec<Vertex>, Vec<u16>) {
+    fn get_vertices_and_indices(&self, parent_size: &GUISize, scale: &f64) -> (Vec<Vertex>, Vec<u16>) {
         const FASCET_COUNT: usize = 10;
         let mut top_left_radius = arcs::make_top_left_arc(self.radius, FASCET_COUNT);
         top_left_radius = widget_utils::translate(top_left_radius, &self.radius.add(&self.position.x), &self.radius.add(&self.position.y));
@@ -125,8 +125,8 @@ impl Child for GUIButton {
         for position in top_left_radius.iter() {
             vertices.push(Vertex {
                 position: [
-                    position.x.get_logical_length(scale) / window_size.width.get_logical_length(scale) - 1.,
-                    -position.y.get_logical_length(scale) / window_size.height.get_logical_length(scale) + 1.,
+                    position.x.get_logical_length(scale) / parent_size.width.get_logical_length(scale) - 1.,
+                    -position.y.get_logical_length(scale) / parent_size.height.get_logical_length(scale) + 1.,
                     0.,
                 ],
                 color: [

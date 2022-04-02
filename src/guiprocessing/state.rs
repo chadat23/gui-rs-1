@@ -63,11 +63,11 @@ impl State {
             width: guiwindow
                 .size
                 .width
-                .get_physical_length(guiwindow.logical_scale.unwrap()) as u32,
+                .get_physical_length(&guiwindow.logical_scale.unwrap()) as u32,
             height: guiwindow
                 .size
                 .height
-                .get_physical_length(guiwindow.logical_scale.unwrap()) as u32,
+                .get_physical_length(&guiwindow.logical_scale.unwrap()) as u32,
             present_mode: wgpu::PresentMode::Fifo,
         };
         surface.configure(&device, &config);
@@ -128,8 +128,9 @@ impl State {
         });
 
         let (vertices, indices) = window_building_utils::make_vertices_and_indices(
+            &guiwindow.size,
             &guiwindow.children,
-            guiwindow.logical_scale.unwrap(),
+            &guiwindow.logical_scale.unwrap(),
         );
 
         let vertex_buffer = device.create_buffer_init(&wgpu::util::BufferInitDescriptor {
@@ -164,16 +165,8 @@ impl State {
             width: new_size.width,
             height: new_size.height,
         };
-        self.config.width =
-            self.guiwindow
-                .size
-                .width
-                .get_physical_length(self.guiwindow.logical_scale.unwrap()) as u32;
-        self.config.height =
-            self.guiwindow
-                .size
-                .height
-                .get_physical_length(self.guiwindow.logical_scale.unwrap()) as u32;
+        self.config.width = new_size.width.get_physical_length(&self.guiwindow.logical_scale.unwrap()).round() as u32;
+        self.config.height = new_size.height.get_physical_length(&self.guiwindow.logical_scale.unwrap()).round() as u32;
         self.surface.configure(&self.device, &self.config);
     }
 
