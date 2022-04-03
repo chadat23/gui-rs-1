@@ -13,7 +13,7 @@ pub mod guilengths {
 
     impl Default for GUILength {
         fn default() -> Self {
-            GUILength { length: 0. }
+            Self { length: 0. }
         }
     }
 
@@ -28,7 +28,7 @@ pub mod guilengths {
 
     impl GUILength {
         pub fn negative(&self) -> Self {
-            GUILength {
+            Self {
                 length: -self.length,
             }
         }
@@ -42,35 +42,35 @@ pub mod guilengths {
         }
 
         pub fn from_pixels(pixels: f64) -> Self {
-            GUILength { length: pixels }
+            Self { length: pixels }
         }
 
         pub fn from_physical_pixels(pixels: f64, scale: &f64) -> Self {
-            GUILength {
+            Self {
                 length: pixels / scale,
             }
         }
 
         pub fn add(&self, other: &GUILength) -> Self {
-            GUILength {
+            Self {
                 length: self.length + other.length,
             }
         }
 
         pub fn subtract(&self, other: &GUILength) -> Self {
-            GUILength {
+            Self {
                 length: self.length - other.length,
             }
         }
 
         pub fn multiply(&self, other: &GUILength) -> Self {
-            GUILength {
+            Self {
                 length: self.length * other.length,
             }
         }
 
         pub fn devide_by(&self, other: &GUILength) -> Self {
-            GUILength {
+            Self {
                 length: self.length / other.length,
             }
         }
@@ -96,18 +96,18 @@ mod guisize {
 
     impl GUISize {
         pub fn from_lengths(width: GUILength, height: GUILength) -> Self {
-            GUISize { width, height }
+            Self { width, height }
         }
 
         pub fn from_pixels(width: f64, height: f64) -> Self {
-            GUISize {
+            Self {
                 width: GUILength::from_pixels(width),
                 height: GUILength::from_pixels(height),
             }
         }
 
         pub fn from_physical_pixels(width: f64, height: f64, scale: &f64) -> Self {
-            GUISize {
+            Self {
                 width: GUILength::from_physical_pixels(width, &scale),
                 height: GUILength::from_physical_pixels(height, &scale),
             }
@@ -132,18 +132,18 @@ mod guiposition {
 
     impl GUIPosition {
         pub fn from_pixels(x: f64, y: f64) -> Self {
-            GUIPosition {
+            Self {
                 x: GUILength::from_pixels(x),
                 y: GUILength::from_pixels(y),
             }
         }
 
         pub fn from_lengths(x: GUILength, y: GUILength) -> Self {
-            GUIPosition { x, y }
+            Self { x, y }
         }
 
         pub fn from_physical_pixels(x: f64, y: f64, scale: &f64) -> Self {
-            GUIPosition {
+            Self {
                 x: GUILength::from_physical_pixels(x, &scale),
                 y: GUILength::from_physical_pixels(y, &scale),
             }

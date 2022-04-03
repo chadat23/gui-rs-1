@@ -18,7 +18,7 @@ pub struct GUIButton {
     /// The background color for the button.
     pub background_color: GUIColor,
     /// A list of child widgets
-    pub children: Option<Vec<Box<dyn Family>>>,
+    pub children: Vec<Box<dyn Family>>,
 }
 
 impl Default for GUIButton {
@@ -28,17 +28,17 @@ impl Default for GUIButton {
             text: "Button",
             size: GUISize {
                 width: GUILength::from_pixels(200.),
-                height: GUILength::from_pixels(200.),
+                height: GUILength::from_pixels(100.),
             },
-            position: GUIPosition::from_pixels(300., 100.),
-            radius: GUILength::from_pixels(50.),
+            position: GUIPosition::from_pixels(0., 0.),
+            radius: GUILength::from_pixels(25.),
             background_color: GUIColor {
                 r: 0.7,
                 g: 0.1,
                 b: 0.4,
                 a: 1.0,
             },
-            children: None,
+            children: Vec::new(),
         }
     }
 }
@@ -66,26 +66,11 @@ impl Parent for GUIButton {
     /// visually obscured by other children should be added
     /// before the obscuring children.
     fn add_child(&mut self, child: Box<dyn Family>) {
-        match &mut self.children {
-            Some(children) => {
-                children.push(child);
-            }
-            _ => {
-                self.children = Some(Vec::from([child]));
-            }
-        };
-    }
-
-    /// Returns the number of children.
-    fn children_len(&self) -> usize {
-        match &self.children {
-            Some(children) => children.len(),
-            None => 0,
-        }
+        self.children.push(child);
     }
 
     /// Gets the children.
-    fn get_area_children(&self) -> &Option<Vec<Box<dyn Family>>> {
+    fn get_children(&self) -> &Vec<Box<dyn Family>> {
         &self.children
     }
 }
@@ -94,7 +79,7 @@ impl Child for GUIButton {
     fn get_vertices_and_indices(
         &self,
         parent_size: &GUISize,
-        scale: &f64,
+        indice_offset: u16,
     ) -> (Vec<Vertex>, Vec<u16>) {
         const FASCET_COUNT: usize = 7;
         let mut top_left_radius = arcs::make_top_left_arc(self.radius, FASCET_COUNT);
@@ -155,16 +140,35 @@ impl Child for GUIButton {
         let number_of_triangles = vertices.len() - 2;
         let mut indices = Vec::with_capacity(number_of_triangles * 3);
         for i in 0..number_of_triangles {
-            indices.push(0);
-            indices.push((i + 1) as u16);
-            indices.push((i + 2) as u16);
-            // indices.push((i + 2) as u16);
-            // indices.push((i + 1) as u16);
-            // indices.push(0);
+            indices.push(indice_offset + 0);
+            indices.push(indice_offset + (i + 1) as u16);
+            indices.push(indice_offset + (i + 2) as u16);
         }
 
         (vertices, indices)
     }
+
+    fn set_position_from_pixels(&mut self, x: f64, y: f64) {
+        self.position = GUIPosition::from_pixels(x, y);
+    }
+
+    fn set_position_from_lengths(&mut self, x: GUILength, y: GUILength) {
+        self.position = GUIPosition::from_lengths(x, y);
+    }
+
+    fn set_position_from_position(&mut self, position: GUIPosition) {
+        self.position = position;
+    }
 }
 
 impl Family for GUIButton {}
+
+impl GUIButton {
+    pub fn set_radius_from_pixels(&mut self, pixels: f64) {
+        self.radius = GUILength::from_pixels(pixels);
+    }
+
+    pub fn set_radius_from_length(&mut self, length: GUILength) {
+        self.radius = length;
+    }
+}

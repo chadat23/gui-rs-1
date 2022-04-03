@@ -44,26 +44,19 @@ pub fn set_window_properties(window: Window, guiwindow: &GUIWindow) -> Window {
 
 pub fn make_vertices_and_indices(
     parent_size: &GUISize,
-    children: &Option<Vec<Box<dyn Family>>>,
-    scale: &f64,
+    children: &Vec<Box<dyn Family>>,
 ) -> (Vec<Vertex>, Vec<u16>) {
     let mut all_vertices: Vec<Vertex> = Vec::new();
     let mut all_indices: Vec<u16> = Vec::new();
-    match children {
-        Some(children) => {
-            for child in children.iter() {
-                let child = child;
-                let (vertices, indices) = child.get_vertices_and_indices(&parent_size, &scale);
-                all_vertices.extend(vertices);
-                all_indices.extend(indices);
-                if child.children_len() > 0 {
-                    let (vertices, indices) = child.get_vertices_and_indices(&parent_size, &scale);
-                    all_vertices.extend(vertices);
-                    all_indices.extend(indices);
-                }
-            }
+    for child in children {
+        let (vertices, indices) = child.get_vertices_and_indices(&parent_size, all_vertices.len() as u16);
+        all_vertices.extend(vertices);
+        all_indices.extend(indices);
+        for child in child.get_children() {
+            let (vertices, indices) = child.get_vertices_and_indices(&parent_size, all_vertices.len() as u16);
+            all_vertices.extend(vertices);
+            all_indices.extend(indices);
         }
-        None => {}
     };
     (all_vertices, all_indices)
 }

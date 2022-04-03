@@ -9,7 +9,7 @@ pub struct GUIColor {
 
 impl Default for GUIColor {
     fn default() -> Self {
-        GUIColor {
+        Self {
             r: 0.4,
             g: 0.4,
             b: 0.4,
@@ -21,7 +21,7 @@ impl Default for GUIColor {
 impl GUIColor {
     /// Creates an GUIColor from u8 red, green, blue, and alpha values.
     pub fn from_rgba_u8u8u8u8(r: u8, g: u8, b: u8, a: u8) -> Self {
-        GUIColor {
+        Self {
             r: r as f64 / 255.,
             g: g as f64 / 255.,
             b: b as f64 / 255.,

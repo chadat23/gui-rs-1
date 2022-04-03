@@ -30,7 +30,7 @@ pub struct GUIWindow {
     /// The background color for the window.
     pub background_color: GUIColor,
     /// A list of child widgets.
-    pub children: Option<Vec<Box<dyn Family>>>,
+    pub children: Vec<Box<dyn Family>>,
     /// The scale that converts between the devices logical and physical pixels.
     pub logical_scale: Option<f64>,
 }
@@ -62,7 +62,7 @@ impl Default for GUIWindow {
                 b: 0.4,
                 a: 1.0,
             },
-            children: None,
+            children: Vec::new(),
             logical_scale: None,
         }
     }
@@ -118,26 +118,11 @@ impl Parent for GUIWindow {
     /// visually obscured by other children should be added
     /// before the obscuring children.
     fn add_child(&mut self, child: Box<dyn Family>) {
-        match &mut self.children {
-            Some(children) => {
-                children.push(child);
-            }
-            _ => {
-                self.children = Some(Vec::from([child]));
-            }
-        };
-    }
-
-    /// Returns the number of children.
-    fn children_len(&self) -> usize {
-        match &self.children {
-            Some(children) => children.len(),
-            None => 0,
-        }
+        self.children.push(child);
     }
 
     /// Gets the children.
-    fn get_area_children(&self) -> &Option<Vec<Box<dyn Family>>> {
+    fn get_children(&self) -> &Vec<Box<dyn Family>> {
         &self.children
     }
 }

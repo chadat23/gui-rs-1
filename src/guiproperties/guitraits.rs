@@ -1,4 +1,4 @@
-use super::guiposition::GUISize;
+use super::guiposition::{GUISize, GUILength, GUIPosition};
 use super::{GUIColor, GUIIcon};
 use crate::guiprocessing::vertices::Vertex;
 
@@ -33,17 +33,21 @@ pub trait Wind: Widget {
 pub trait Parent: Widget {
     fn add_child(&mut self, child: Box<dyn Family>);
 
-    fn children_len(&self) -> usize;
-
-    fn get_area_children(&self) -> &Option<Vec<Box<dyn Family>>>;
+    fn get_children(&self) -> &Vec<Box<dyn Family>>;
 }
 
 pub trait Child: Widget {
     fn get_vertices_and_indices(
         &self,
         parent_size: &GUISize,
-        scale: &f64,
+        indice_offset: u16
     ) -> (Vec<Vertex>, Vec<u16>);
+
+    fn set_position_from_pixels(&mut self, x: f64, y: f64);
+
+    fn set_position_from_lengths(&mut self, x: GUILength, y: GUILength);
+
+    fn set_position_from_position(&mut self, position: GUIPosition);
 }
 
 pub trait Family: Child + Parent {}
