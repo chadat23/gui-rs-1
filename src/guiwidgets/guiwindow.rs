@@ -1,3 +1,5 @@
+use uuid::Uuid;
+
 use crate::guiproperties::guiposition::GUILength;
 use crate::guiproperties::guiposition::{GUIPosition, GUISize};
 use crate::guiproperties::guitraits::{Family, Parent, Widget, Wind};
@@ -33,7 +35,12 @@ pub struct GUIWindow {
     pub children: Vec<Box<dyn Family>>,
     /// The scale that converts between the devices logical and physical pixels.
     pub logical_scale: Option<f64>,
+    /// The human readable name of the window
+    pub name: &'static str,
+    pub id: u128,
 }
+
+const DEFAULT_WINDOW_NAME: &str = "this is the default name of the window";
 
 impl Default for GUIWindow {
     // Returns a windows with all of the default values.
@@ -64,6 +71,8 @@ impl Default for GUIWindow {
             },
             children: Vec::new(),
             logical_scale: None,
+            name: DEFAULT_WINDOW_NAME,
+            id: Uuid::new_v4().as_u128(),
         }
     }
 }
@@ -81,6 +90,10 @@ impl Widget for GUIWindow {
     // Set background color of the window.
     fn set_background_color(&mut self, color: GUIColor) {
         self.background_color = color;
+    }
+
+    fn set_id(&mut self, id: u128) {
+        self.id = id;
     }
 }
 
@@ -121,8 +134,22 @@ impl Parent for GUIWindow {
         self.children.push(child);
     }
 
+    fn set_children(&mut self, children: Vec<Box<dyn Family>>) {
+        self.children = children;
+    }
+
     /// Gets the children.
     fn get_children(&self) -> &Vec<Box<dyn Family>> {
         &self.children
     }
+
+    // /// Gets the children.
+    // fn get_children_mut(&mut self) -> &mut Vec<Box<dyn Family>> {
+    //     &mut self.children
+    // }
+
+    // fn give_children(&mut self) -> Vec<Box<dyn Family>> {
+    //     let a = self.children;
+    //     a
+    // }
 }

@@ -5,6 +5,7 @@ use winit::event_loop::{ControlFlow, EventLoop};
 use winit::window::WindowBuilder;
 
 use crate::guiproperties::guiposition::GUISize;
+use crate::guiproperties::guitraits::{Widget, Parent};
 use crate::guiresources::GUIResources;
 use crate::guiwidgets::GUIWindow;
 
@@ -20,6 +21,8 @@ pub fn run(mut guiwindow: GUIWindow, guiresources: GUIResources) {
     let event_loop = EventLoop::new();
     let window = WindowBuilder::new().build(&event_loop).unwrap();
     guiwindow.logical_scale = Some(window.scale_factor());
+    // guiwindow.set_id(0);
+    // (guiwindow.children, _) = window_building_utils::set_widget_ids(guiwindow.give_children(), 1);
     let guiwindow = guiwindow;
     let window = window_building_utils::set_window_properties(window, &guiwindow);
 

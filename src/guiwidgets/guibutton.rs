@@ -1,3 +1,7 @@
+use std::time::Instant;
+
+use uuid::Uuid;
+
 use crate::guiprocessing::vertices::Vertex;
 use crate::guiproperties::guiposition::{GUILength, GUIPosition, GUISize};
 use crate::guiproperties::guitraits::{Child, Family, Parent, Widget};
@@ -19,11 +23,19 @@ pub struct GUIButton {
     pub background_color: GUIColor,
     /// A list of child widgets
     pub children: Vec<Box<dyn Family>>,
+    /// The human readable name of the button
+    pub name: &'static str,
+    pub id: u128,
 }
 
+const DEFAULT_BUTTON_NAME: &str = "this is the default name of the window";
+
+// #[cfg(feature = "v4")] 
 impl Default for GUIButton {
     // Returns a button with all of the default values.
+    // 
     fn default() -> GUIButton {
+
         GUIButton {
             text: "Button",
             size: GUISize {
@@ -39,6 +51,8 @@ impl Default for GUIButton {
                 a: 1.0,
             },
             children: Vec::new(),
+            name: DEFAULT_BUTTON_NAME,
+            id: Uuid::new_v4().as_u128(),
         }
     }
 }
@@ -57,6 +71,10 @@ impl Widget for GUIButton {
     fn set_background_color(&mut self, color: GUIColor) {
         self.background_color = color;
     }
+
+    fn set_id(&mut self, id: u128) {
+        self.id = id;
+    }
 }
 
 impl Parent for GUIButton {
@@ -69,10 +87,23 @@ impl Parent for GUIButton {
         self.children.push(child);
     }
 
+    fn set_children(&mut self, children: Vec<Box<dyn Family>>) {
+        self.children = children;
+    }
+
     /// Gets the children.
     fn get_children(&self) -> &Vec<Box<dyn Family>> {
         &self.children
     }
+
+    // /// Gets the children.
+    // fn get_children_mut(&mut self) -> &mut Vec<Box<dyn Family>> {
+    //     &mut self.children
+    // }
+
+    // fn give_children(&mut self) -> Vec<Box<dyn Family>> {
+    //     self.children
+    // }
 }
 
 impl Child for GUIButton {
@@ -135,6 +166,7 @@ impl Child for GUIButton {
                     self.background_color.g as f32,
                     self.background_color.b as f32,
                 ],
+                id: self.id
             });
         }
         let number_of_triangles = vertices.len() - 2;

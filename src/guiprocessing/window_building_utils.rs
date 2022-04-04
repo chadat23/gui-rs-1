@@ -60,3 +60,15 @@ pub fn make_vertices_and_indices(
     };
     (all_vertices, all_indices)
 }
+
+// pub fn set_widget_ids(mut children: Vec<Box<dyn Family>>, mut index: u16) -> (Vec<Box<dyn Family>>, u16) {
+//     for child in children {
+//         child.set_id(index);
+//         index += 1;
+//         let (c, i) = set_widget_ids(child.give_children(), index);
+//         child.set_children(c);
+//         index = i;
+//     }
+
+//     (children, index)
+// }

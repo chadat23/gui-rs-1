@@ -11,6 +11,10 @@ pub trait Widget {
     // Set background color of the window.
     #[allow(non_snake_case)]
     fn set_background_color(&mut self, color: GUIColor);
+
+    fn set_id(&mut self, id: u128);
+
+    // fn get_name(&self) -> &'static str;
 }
 
 pub trait Wind: Widget {
@@ -33,7 +37,13 @@ pub trait Wind: Widget {
 pub trait Parent: Widget {
     fn add_child(&mut self, child: Box<dyn Family>);
 
+    fn set_children(&mut self, children: Vec<Box<dyn Family>>);
+
     fn get_children(&self) -> &Vec<Box<dyn Family>>;
+
+    // fn get_children_mut(&mut self) -> &mut Vec<Box<dyn Family>>;
+
+    // fn give_children(&mut self) -> Vec<Box<dyn Family>>;
 }
 
 pub trait Child: Widget {
